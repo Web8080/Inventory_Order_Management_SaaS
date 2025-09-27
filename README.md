@@ -1679,8 +1679,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 <div align="center">
 
-**Built with ❤️ by the Inventory SaaS Team**
+**Built with ❤️ by the Victor Ibhafidon for xtainless technologies **
 
-[Website](https://inventory-saas.com) • [Documentation](docs/ARCHITECTURE.md) • [Demo](https://demo.inventory-saas.com) • [Support](https://github.com/web8080/inventory-saas/issues)
+[Website](xtainlesstech.com) • [Documentation](docs/ARCHITECTURE.md) • [Product Demo](https://demo.inventory-saas.com) • [Support](https://github.com/web8080/inventory-saas/issues)
 
 </div>
