@@ -1,0 +1,2357 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Management SaaS</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f7fa; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.1); }
+        .nav { background: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .nav-buttons { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+        .nav-btn { padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s ease; }
+        .nav-btn.active { background: #667eea; color: white; }
+        .nav-btn:not(.active) { background: #f8f9fa; color: #495057; }
+        .nav-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .page { display: none; }
+        .page.active { display: block; }
+        .card { background: white; padding: 25px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 25px; border-radius: 15px; text-align: center; }
+        .stat-number { font-size: 2.5em; font-weight: bold; margin-bottom: 10px; }
+        .stat-label { font-size: 1.1em; opacity: 0.9; }
+        .chart-container { position: relative; height: 400px; margin: 20px 0; }
+        .table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .table th, .table td { padding: 15px; text-align: left; border-bottom: 1px solid #dee2e6; }
+        .table th { background: #f8f9fa; font-weight: 600; }
+        .table tr:hover { background: #f8f9fa; }
+        .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; margin: 5px; transition: all 0.3s ease; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-warning { background: #ffc107; color: black; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; margin-bottom: 8px; font-weight: 600; color: #495057; }
+        .form-control { width: 100%; padding: 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 16px; transition: border-color 0.3s ease; }
+        .form-control:focus { outline: none; border-color: #667eea; }
+        .alert { padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        .alert-danger { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+        .modal-content { background: white; margin: 5% auto; padding: 30px; border-radius: 15px; width: 90%; max-width: 600px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+        .close:hover { color: black; }
+        .ml-insights { background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); color: white; padding: 20px; border-radius: 15px; margin: 20px 0; }
+        .insight-item { background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; margin: 10px 0; }
+        .pulse { animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.8em; font-weight: 600; }
+        .badge-success { background: #28a745; color: white; }
+        .badge-warning { background: #ffc107; color: black; }
+        .badge-danger { background: #dc3545; color: white; }
+        .badge-info { background: #17a2b8; color: white; }
+        .integration-item { background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 15px 0; border-left: 4px solid #667eea; }
+        .integration-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .settings-section { margin: 30px 0; padding: 20px; background: #f8f9fa; border-radius: 10px; }
+        .report-section { margin: 20px 0; }
+        .footer { background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); color: white; padding: 30px 20px; margin-top: 40px; border-radius: 15px; text-align: center; box-shadow: 0 -4px 20px rgba(0,0,0,0.1); }
+        .footer-content { max-width: 1200px; margin: 0 auto; }
+        .footer-brand { font-size: 1.2em; font-weight: 600; margin-bottom: 10px; }
+        .footer-trademark { font-size: 0.9em; opacity: 0.8; margin-bottom: 5px; }
+        .footer-company { font-size: 0.85em; opacity: 0.7; }
+        .footer-divider { width: 100px; height: 2px; background: linear-gradient(90deg, #667eea, #764ba2); margin: 15px auto; border-radius: 2px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏭 Inventory Management SaaS</h1>
+            <p>Advanced AI-Powered Inventory & Order Management Platform</p>
+        </div>
+
+        <div class="nav">
+            <div class="nav-buttons">
+                <button class="nav-btn active" onclick="showPage('dashboard')">📊 Dashboard</button>
+                <button class="nav-btn" onclick="showPage('products')">📦 Products</button>
+                <button class="nav-btn" onclick="showPage('orders')">🛒 Orders</button>
+                <button class="nav-btn" onclick="showPage('inventory')">📈 Inventory</button>
+                <button class="nav-btn" onclick="showPage('reports')">📋 Reports</button>
+                <button class="nav-btn" onclick="showPage('integrations')">🔗 Integrations</button>
+                <button class="nav-btn" onclick="showPage('ml')">🤖 AI Insights</button>
+                <button class="nav-btn" onclick="showPage('settings')">⚙️ Settings</button>
+            </div>
+        </div>
+
+        <!-- Dashboard Page -->
+        <div id="dashboard" class="page active">
+            <div class="stats-grid">
+                <div class="stat-card pulse">
+                    <div class="stat-number">1,234</div>
+                    <div class="stat-label">Total Products</div>
+                </div>
+                <div class="stat-card pulse">
+                    <div class="stat-number">456</div>
+                    <div class="stat-label">Active Orders</div>
+                </div>
+                <div class="stat-card pulse">
+                    <div class="stat-number">$12,345</div>
+                    <div class="stat-label">Monthly Revenue</div>
+                </div>
+                <div class="stat-card pulse">
+                    <div class="stat-number">23</div>
+                    <div class="stat-label">Low Stock Alerts</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>📈 Sales Analytics</h2>
+                <div class="chart-container">
+                    <canvas id="salesChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>🎯 AI-Powered Insights</h2>
+                <div class="ml-insights">
+                    <div class="insight-item">
+                        <strong>🔮 Demand Forecast:</strong> iPhone 15 Pro sales expected to increase 25% next month
+                    </div>
+                    <div class="insight-item">
+                        <strong>⚠️ Stock Alert:</strong> MacBook Pro M3 will run out in 5 days based on current trends
+                    </div>
+                    <div class="insight-item">
+                        <strong>💰 Revenue Prediction:</strong> Next month revenue projected at $15,200 (+23%)
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>📊 Top Performing Products</h2>
+                <div class="chart-container">
+                    <canvas id="productsChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Products Page -->
+        <div id="products" class="page">
+            <div class="card">
+                <h2>📦 Product Management</h2>
+                <button class="btn btn-primary" onclick="openModal('addProductModal')">+ Add New Product</button>
+                <button class="btn btn-success" onclick="bulkImport()">📥 Bulk Import</button>
+                
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>SKU</th>
+                            <th>Product Name</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productsTable">
+                        <tr>
+                            <td>IPH15-128-BLK</td>
+                            <td>iPhone 15 Pro</td>
+                            <td>Electronics</td>
+                            <td>$999.99</td>
+                            <td>25</td>
+                            <td><span class="badge badge-success">In Stock</span></td>
+                            <td>
+                                <button class="btn btn-primary" onclick="editProduct(1)">Edit</button>
+                                <button class="btn btn-danger" onclick="deleteProduct(1)">Delete</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>SGS24-256-BLU</td>
+                            <td>Samsung Galaxy S24</td>
+                            <td>Electronics</td>
+                            <td>$799.99</td>
+                            <td>15</td>
+                            <td><span class="badge badge-success">In Stock</span></td>
+                            <td>
+                                <button class="btn btn-primary" onclick="editProduct(2)">Edit</button>
+                                <button class="btn btn-danger" onclick="deleteProduct(2)">Delete</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>MBP-M3-512-SLV</td>
+                            <td>MacBook Pro M3</td>
+                            <td>Electronics</td>
+                            <td>$1,999.99</td>
+                            <td>8</td>
+                            <td><span class="badge badge-warning">Low Stock</span></td>
+                            <td>
+                                <button class="btn btn-primary" onclick="editProduct(3)">Edit</button>
+                                <button class="btn btn-danger" onclick="deleteProduct(3)">Delete</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Orders Page -->
+        <div id="orders" class="page">
+            <div class="card">
+                <h2>🛒 Order Management</h2>
+                <button class="btn btn-primary" onclick="createNewOrder()">+ Create New Order</button>
+                <button class="btn btn-success" onclick="exportOrders()">📥 Export Orders</button>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">156</div>
+                        <div class="stat-label">Pending Orders</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">89</div>
+                        <div class="stat-label">Completed Today</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">$8,450</div>
+                        <div class="stat-label">Today's Revenue</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">12</div>
+                        <div class="stat-label">Overdue Orders</div>
+                    </div>
+                </div>
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Date</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>#ORD-2024-001</td>
+                            <td>John Smith</td>
+                            <td>2024-01-15</td>
+                            <td>$299.99</td>
+                            <td><span class="badge badge-success">Completed</span></td>
+                            <td>
+                                <button class="btn btn-primary" onclick="viewOrder('ORD-2024-001')">View</button>
+                                <button class="btn btn-warning" onclick="editOrder('ORD-2024-001')">Edit</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>#ORD-2024-002</td>
+                            <td>Sarah Johnson</td>
+                            <td>2024-01-15</td>
+                            <td>$1,199.99</td>
+                            <td><span class="badge badge-warning">Processing</span></td>
+                            <td>
+                                <button class="btn btn-primary" onclick="viewOrder('ORD-2024-002')">View</button>
+                                <button class="btn btn-warning" onclick="editOrder('ORD-2024-002')">Edit</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>#ORD-2024-003</td>
+                            <td>Mike Davis</td>
+                            <td>2024-01-14</td>
+                            <td>$89.99</td>
+                            <td><span class="badge badge-danger">Pending</span></td>
+                            <td>
+                                <button class="btn btn-primary" onclick="viewOrder('ORD-2024-003')">View</button>
+                                <button class="btn btn-warning" onclick="editOrder('ORD-2024-003')">Edit</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Inventory Page -->
+        <div id="inventory" class="page">
+            <div class="card">
+                <h2>📈 Inventory Management</h2>
+                <button class="btn btn-primary" onclick="openModal('adjustStockModal')">📊 Adjust Stock</button>
+                <button class="btn btn-success" onclick="bulkStockUpdate()">📥 Bulk Update</button>
+                <button class="btn btn-warning" onclick="generateStockReport()">📋 Stock Report</button>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">1,234</div>
+                        <div class="stat-label">Total SKUs</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card" style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);">
+                            <div class="stat-number">23</div>
+                            <div class="stat-label">Low Stock Items</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">$45,678</div>
+                        <div class="stat-label">Inventory Value</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">89%</div>
+                        <div class="stat-label">Stock Accuracy</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>🚨 Low Stock Alerts</h3>
+                    <div class="alert alert-warning">
+                        <strong>MacBook Pro M3</strong> - Only 8 units remaining (Reorder point: 10)
+                    </div>
+                    <div class="alert alert-warning">
+                        <strong>Samsung Galaxy S24</strong> - Only 15 units remaining (Reorder point: 20)
+                    </div>
+                    <div class="alert alert-danger">
+                        <strong>Dell XPS 13</strong> - Only 3 units remaining (Reorder point: 15)
+                    </div>
+                </div>
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>SKU</th>
+                            <th>Current Stock</th>
+                            <th>Reorder Point</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>iPhone 15 Pro</td>
+                            <td>IPH15-128-BLK</td>
+                            <td>25</td>
+                            <td>10</td>
+                            <td><span class="badge badge-success">In Stock</span></td>
+                            <td>
+                                <button class="btn btn-primary" onclick="adjustStock('IPH15-128-BLK')">Adjust</button>
+                                <button class="btn btn-success" onclick="reorder('IPH15-128-BLK')">Reorder</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>MacBook Pro M3</td>
+                            <td>MBP-M3-512-SLV</td>
+                            <td>8</td>
+                            <td>10</td>
+                            <td><span class="badge badge-warning">Low Stock</span></td>
+                            <td>
+                                <button class="btn btn-primary" onclick="adjustStock('MBP-M3-512-SLV')">Adjust</button>
+                                <button class="btn btn-success" onclick="reorder('MBP-M3-512-SLV')">Reorder</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Reports Page -->
+        <div id="reports" class="page">
+            <div class="card">
+                <h2>📋 Reports & Analytics</h2>
+                <div class="nav-buttons">
+                    <button class="nav-btn active" onclick="showReport('sales')">📊 Sales Report</button>
+                    <button class="nav-btn" onclick="showReport('inventory')">📦 Inventory Report</button>
+                    <button class="nav-btn" onclick="showReport('performance')">📈 Performance Report</button>
+                    <button class="nav-btn" onclick="showReport('financial')">💰 Financial Report</button>
+                </div>
+
+                <div id="salesReport" class="report-section">
+                    <h3>📊 Sales Analytics</h3>
+                    <div class="chart-container">
+                        <canvas id="salesReportChart"></canvas>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">$45,678</div>
+                            <div class="stat-label">Total Sales</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">234</div>
+                            <div class="stat-label">Orders Processed</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">$195.20</div>
+                            <div class="stat-label">Average Order Value</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">15.2%</div>
+                            <div class="stat-label">Growth Rate</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="inventoryReport" class="report-section" style="display: none;">
+                    <h3>📦 Inventory Analysis</h3>
+                    <div class="chart-container">
+                        <canvas id="inventoryReportChart"></canvas>
+                    </div>
+                    <div class="alert alert-info">
+                        <strong>Inventory Turnover:</strong> 4.2x per year (Industry average: 3.5x)
+                    </div>
+                    <div class="alert alert-success">
+                        <strong>Stock Accuracy:</strong> 89% (Target: 95%)
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Integrations Page -->
+        <div id="integrations" class="page">
+            <div class="card">
+                <h2>🔗 Third-Party Integrations</h2>
+                <p>Connect your inventory system with popular e-commerce platforms and services.</p>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">3</div>
+                        <div class="stat-label">Active Integrations</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">1,245</div>
+                        <div class="stat-label">Products Synced</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">89</div>
+                        <div class="stat-label">Orders Imported</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">99.2%</div>
+                        <div class="stat-label">Sync Success Rate</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>🛍️ E-commerce Platforms</h3>
+                    <div class="integration-item">
+                        <div class="integration-header">
+                            <h4>🛒 Shopify</h4>
+                            <span class="badge badge-success">Connected</span>
+                        </div>
+                        <p>Last sync: 2 minutes ago | Products: 456 | Orders: 23</p>
+                        <button class="btn btn-primary" onclick="configureShopify()">Configure</button>
+                        <button class="btn btn-warning" onclick="syncShopify()">Sync Now</button>
+                    </div>
+
+                    <div class="integration-item">
+                        <div class="integration-header">
+                            <h4>🛍️ WooCommerce</h4>
+                            <span class="badge badge-warning">Pending Setup</span>
+                        </div>
+                        <p>Connect your WooCommerce store to sync products and orders</p>
+                        <button class="btn btn-primary" onclick="connectWooCommerce()">Connect</button>
+                    </div>
+
+                    <div class="integration-item">
+                        <div class="integration-header">
+                            <h4>📦 Amazon</h4>
+                            <span class="badge badge-success">Connected</span>
+                        </div>
+                        <p>Last sync: 5 minutes ago | Products: 234 | Orders: 12</p>
+                        <button class="btn btn-primary" onclick="configureAmazon()">Configure</button>
+                        <button class="btn btn-warning" onclick="syncAmazon()">Sync Now</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>💼 Business Tools</h3>
+                    <div class="integration-item">
+                        <div class="integration-header">
+                            <h4>💰 QuickBooks</h4>
+                            <span class="badge badge-warning">Pending Setup</span>
+                        </div>
+                        <p>Sync financial data and generate invoices automatically</p>
+                        <button class="btn btn-primary" onclick="connectQuickBooks()">Connect</button>
+                    </div>
+
+                    <div class="integration-item">
+                        <div class="integration-header">
+                            <h4>📧 Mailchimp</h4>
+                            <span class="badge badge-success">Connected</span>
+                        </div>
+                        <p>Last sync: 1 hour ago | Subscribers: 1,234</p>
+                        <button class="btn btn-primary" onclick="configureMailchimp()">Configure</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Insights Page -->
+        <div id="ml" class="page">
+            <div class="card">
+                <h2>🤖 AI-Powered Insights</h2>
+                <p>Leverage machine learning to optimize your inventory and predict future trends.</p>
+
+                <div class="ml-insights">
+                    <div class="insight-item">
+                        <h4>🔮 Demand Forecasting</h4>
+                        <p><strong>iPhone 15 Pro:</strong> Expected demand increase of 25% next month</p>
+                        <p><strong>MacBook Pro M3:</strong> Seasonal decline expected (-15%)</p>
+                        <p><strong>Samsung Galaxy S24:</strong> Steady growth (+8%)</p>
+                    </div>
+
+                    <div class="insight-item">
+                        <h4>⚠️ Stock Optimization</h4>
+                        <p><strong>Reorder Recommendation:</strong> MacBook Pro M3 - Order 50 units by Jan 20</p>
+                        <p><strong>Overstock Alert:</strong> Dell XPS 13 - Consider promotional pricing</p>
+                        <p><strong>Seasonal Adjustment:</strong> Winter clothing inventory should be reduced by 30%</p>
+                    </div>
+
+                    <div class="insight-item">
+                        <h4>💰 Revenue Predictions</h4>
+                        <p><strong>Next Month:</strong> $15,200 (+23% from current month)</p>
+                        <p><strong>Next Quarter:</strong> $48,500 (+18% from last quarter)</p>
+                        <p><strong>Confidence Level:</strong> 87% accuracy based on historical data</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>📊 ML Model Performance</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">94.2%</div>
+                            <div class="stat-label">Forecast Accuracy</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">87.5%</div>
+                            <div class="stat-label">Stock Optimization</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">91.8%</div>
+                            <div class="stat-label">Revenue Prediction</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">2.3%</div>
+                            <div class="stat-label">Stockout Reduction</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>🎯 AI Recommendations</h3>
+                    <div class="alert alert-success">
+                        <strong>✅ High Priority:</strong> Increase iPhone 15 Pro stock by 30% for February
+                    </div>
+                    <div class="alert alert-warning">
+                        <strong>⚠️ Medium Priority:</strong> Reduce MacBook Pro M3 inventory by 20% for Q2
+                    </div>
+                    <div class="alert alert-info">
+                        <strong>ℹ️ Low Priority:</strong> Consider adding wireless accessories category
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Page -->
+        <div id="settings" class="page">
+            <div class="card">
+                <h2>⚙️ System Settings</h2>
+                
+                <div class="settings-section">
+                    <h3>🏢 Company Information</h3>
+                    <form id="companySettings">
+                        <div class="form-group">
+                            <label class="form-label">Company Name</label>
+                            <input type="text" class="form-control" value="Demo Company" name="companyName">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" value="admin@democompany.com" name="email">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Phone</label>
+                            <input type="tel" class="form-control" value="+1 (555) 123-4567" name="phone">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </form>
+                </div>
+
+                <div class="settings-section">
+                    <h3>📊 Inventory Settings</h3>
+                    <form id="inventorySettings">
+                        <div class="form-group">
+                            <label class="form-label">Default Reorder Point</label>
+                            <input type="number" class="form-control" value="10" name="reorderPoint">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Low Stock Alert Threshold</label>
+                            <input type="number" class="form-control" value="5" name="lowStockThreshold">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Currency</label>
+                            <select class="form-control" name="currency">
+                                <option value="USD" selected>USD ($)</option>
+                                <option value="EUR">EUR (€)</option>
+                                <option value="GBP">GBP (£)</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </form>
+                </div>
+
+                <div class="settings-section">
+                    <h3>🔔 Notification Settings</h3>
+                    <form id="notificationSettings">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <input type="checkbox" checked> Email notifications for low stock
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <input type="checkbox" checked> SMS alerts for critical stock levels
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <input type="checkbox"> Daily sales summary emails
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <input type="checkbox" checked> Weekly inventory reports
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </form>
+                </div>
+
+                <div class="settings-section">
+                    <h3>👥 User Management</h3>
+                    <button class="btn btn-primary" onclick="addUser()">+ Add User</button>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>John Admin</td>
+                                <td>admin@democompany.com</td>
+                                <td>Owner</td>
+                                <td><span class="badge badge-success">Active</span></td>
+                                <td>
+                                    <button class="btn btn-primary" onclick="editUser(1)">Edit</button>
+                                    <button class="btn btn-danger" onclick="deleteUser(1)">Delete</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Sarah Manager</td>
+                                <td>manager@democompany.com</td>
+                                <td>Manager</td>
+                                <td><span class="badge badge-success">Active</span></td>
+                                <td>
+                                    <button class="btn btn-primary" onclick="editUser(2)">Edit</button>
+                                    <button class="btn btn-danger" onclick="deleteUser(2)">Delete</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Product Modal -->
+        <div id="addProductModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal('addProductModal')">&times;</span>
+                <h2>Add New Product</h2>
+                <form id="addProductForm">
+                    <div class="form-group">
+                        <label class="form-label">Product Name</label>
+                        <input type="text" class="form-control" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">SKU</label>
+                        <input type="text" class="form-control" name="sku" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Category</label>
+                        <select class="form-control" name="category" required>
+                            <option value="">Select Category</option>
+                            <option value="Electronics">Electronics</option>
+                            <option value="Clothing">Clothing</option>
+                            <option value="Home & Garden">Home & Garden</option>
+                            <option value="Sports & Outdoors">Sports & Outdoors</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Price</label>
+                        <input type="number" class="form-control" name="price" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Initial Stock</label>
+                        <input type="number" class="form-control" name="stock" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" name="description" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Product</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addProductModal')">Cancel</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-content">
+                <div class="footer-brand">🏭 Inventory Management SaaS</div>
+                <div class="footer-divider"></div>
+                <div class="footer-trademark">© 2024 This web application was designed by Victor Ibhafidon</div>
+                <div class="footer-company">for XTAINLESS TECHNOLOGIES™</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data Management System
+        class DataManager {
+            constructor() {
+                this.initializeData();
+            }
+
+            initializeData() {
+                // Initialize default data if not exists
+                if (!localStorage.getItem('inventoryData')) {
+                    const defaultData = {
+                        products: [
+                            { id: 1, sku: 'IPH15-128-BLK', name: 'iPhone 15 Pro', category: 'Electronics', price: 999.99, stock: 25, reorderPoint: 10, description: 'Latest iPhone with Pro features' },
+                            { id: 2, sku: 'SGS24-256-BLU', name: 'Samsung Galaxy S24', category: 'Electronics', price: 799.99, stock: 15, reorderPoint: 20, description: 'Premium Android smartphone' },
+                            { id: 3, sku: 'MBP-M3-512-SLV', name: 'MacBook Pro M3', category: 'Electronics', price: 1999.99, stock: 8, reorderPoint: 10, description: 'Professional laptop with M3 chip' }
+                        ],
+                        orders: [
+                            { id: 'ORD-2024-001', customer: 'John Smith', date: '2024-01-15', total: 299.99, status: 'Completed', items: [{ product: 'iPhone 15 Pro', quantity: 1, price: 299.99 }] },
+                            { id: 'ORD-2024-002', customer: 'Sarah Johnson', date: '2024-01-15', total: 1199.99, status: 'Processing', items: [{ product: 'MacBook Pro M3', quantity: 1, price: 1199.99 }] },
+                            { id: 'ORD-2024-003', customer: 'Mike Davis', date: '2024-01-14', total: 89.99, status: 'Pending', items: [{ product: 'Samsung Galaxy S24', quantity: 1, price: 89.99 }] }
+                        ],
+                        users: [
+                            { id: 1, name: 'John Admin', email: 'admin@democompany.com', role: 'Owner', status: 'Active' },
+                            { id: 2, name: 'Sarah Manager', email: 'manager@democompany.com', role: 'Manager', status: 'Active' }
+                        ],
+                        settings: {
+                            companyName: 'Demo Company',
+                            email: 'admin@democompany.com',
+                            phone: '+1 (555) 123-4567',
+                            reorderPoint: 10,
+                            lowStockThreshold: 5,
+                            currency: 'USD'
+                        }
+                    };
+                    localStorage.setItem('inventoryData', JSON.stringify(defaultData));
+                }
+            }
+
+            getData() {
+                return JSON.parse(localStorage.getItem('inventoryData'));
+            }
+
+            saveData(data) {
+                localStorage.setItem('inventoryData', JSON.stringify(data));
+            }
+
+            addProduct(product) {
+                const data = this.getData();
+                product.id = Date.now();
+                data.products.push(product);
+                this.saveData(data);
+                return product;
+            }
+
+            updateProduct(id, updates) {
+                const data = this.getData();
+                const index = data.products.findIndex(p => p.id === id);
+                if (index !== -1) {
+                    data.products[index] = { ...data.products[index], ...updates };
+                    this.saveData(data);
+                    return data.products[index];
+                }
+                return null;
+            }
+
+            deleteProduct(id) {
+                const data = this.getData();
+                data.products = data.products.filter(p => p.id !== id);
+                this.saveData(data);
+            }
+
+            addOrder(order) {
+                const data = this.getData();
+                order.id = 'ORD-' + Date.now();
+                data.orders.push(order);
+                this.saveData(data);
+                return order;
+            }
+
+            updateOrder(id, updates) {
+                const data = this.getData();
+                const index = data.orders.findIndex(o => o.id === id);
+                if (index !== -1) {
+                    data.orders[index] = { ...data.orders[index], ...updates };
+                    this.saveData(data);
+                    return data.orders[index];
+                }
+                return null;
+            }
+
+            addUser(user) {
+                const data = this.getData();
+                user.id = Date.now();
+                data.users.push(user);
+                this.saveData(data);
+                return user;
+            }
+
+            updateUser(id, updates) {
+                const data = this.getData();
+                const index = data.users.findIndex(u => u.id === id);
+                if (index !== -1) {
+                    data.users[index] = { ...data.users[index], ...updates };
+                    this.saveData(data);
+                    return data.users[index];
+                }
+                return null;
+            }
+
+            deleteUser(id) {
+                const data = this.getData();
+                data.users = data.users.filter(u => u.id !== id);
+                this.saveData(data);
+            }
+
+            updateSettings(settings) {
+                const data = this.getData();
+                data.settings = { ...data.settings, ...settings };
+                this.saveData(data);
+            }
+        }
+
+        // Initialize data manager
+        const dataManager = new DataManager();
+
+        // Navigation
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            event.target.classList.add('active');
+            
+            // Load page-specific content
+            if (pageId === 'dashboard') {
+                loadDashboardCharts();
+            } else if (pageId === 'products') {
+                loadProductsTable();
+            } else if (pageId === 'orders') {
+                loadOrdersTable();
+            } else if (pageId === 'inventory') {
+                loadInventoryTable();
+            } else if (pageId === 'settings') {
+                loadSettings();
+            }
+        }
+
+        // Modal functions
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Dashboard Charts
+        function loadDashboardCharts() {
+            // Sales Chart
+            const salesCtx = document.getElementById('salesChart').getContext('2d');
+            new Chart(salesCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Sales Revenue',
+                        data: [12000, 19000, 15000, 25000, 22000, 30000],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Products Chart
+            const productsCtx = document.getElementById('productsChart').getContext('2d');
+            new Chart(productsCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['iPhone 15 Pro', 'Samsung Galaxy S24', 'MacBook Pro M3', 'Dell XPS 13', 'Others'],
+                    datasets: [{
+                        data: [35, 25, 20, 15, 5],
+                        backgroundColor: ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Product Management
+        function loadProductsTable() {
+            const data = dataManager.getData();
+            const tbody = document.getElementById('productsTable');
+            tbody.innerHTML = '';
+            
+            data.products.forEach(product => {
+                const row = document.createElement('tr');
+                const statusClass = product.stock <= product.reorderPoint ? 'badge-warning' : 'badge-success';
+                const statusText = product.stock <= product.reorderPoint ? 'Low Stock' : 'In Stock';
+                
+                row.innerHTML = `
+                    <td>${product.sku}</td>
+                    <td>${product.name}</td>
+                    <td>${product.category}</td>
+                    <td>$${product.price.toFixed(2)}</td>
+                    <td>${product.stock}</td>
+                    <td><span class="badge ${statusClass}">${statusText}</span></td>
+                    <td>
+                        <button class="btn btn-primary" onclick="editProduct(${product.id})">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteProduct(${product.id})">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function editProduct(id) {
+            const data = dataManager.getData();
+            const product = data.products.find(p => p.id === id);
+            if (product) {
+                // Create edit modal
+                const modal = document.createElement('div');
+                modal.className = 'modal';
+                modal.id = 'editProductModal';
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <span class="close" onclick="closeModal('editProductModal')">&times;</span>
+                        <h2>Edit Product</h2>
+                        <form id="editProductForm">
+                            <input type="hidden" name="id" value="${product.id}">
+                            <div class="form-group">
+                                <label class="form-label">Product Name</label>
+                                <input type="text" class="form-control" name="name" value="${product.name}" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">SKU</label>
+                                <input type="text" class="form-control" name="sku" value="${product.sku}" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Category</label>
+                                <select class="form-control" name="category" required>
+                                    <option value="Electronics" ${product.category === 'Electronics' ? 'selected' : ''}>Electronics</option>
+                                    <option value="Clothing" ${product.category === 'Clothing' ? 'selected' : ''}>Clothing</option>
+                                    <option value="Home & Garden" ${product.category === 'Home & Garden' ? 'selected' : ''}>Home & Garden</option>
+                                    <option value="Sports & Outdoors" ${product.category === 'Sports & Outdoors' ? 'selected' : ''}>Sports & Outdoors</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Price</label>
+                                <input type="number" class="form-control" name="price" value="${product.price}" step="0.01" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Stock</label>
+                                <input type="number" class="form-control" name="stock" value="${product.stock}" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Reorder Point</label>
+                                <input type="number" class="form-control" name="reorderPoint" value="${product.reorderPoint}" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Description</label>
+                                <textarea class="form-control" name="description" rows="3">${product.description}</textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Update Product</button>
+                            <button type="button" class="btn btn-secondary" onclick="closeModal('editProductModal')">Cancel</button>
+                        </form>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+                modal.style.display = 'block';
+                
+                document.getElementById('editProductForm').addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const formData = new FormData(this);
+                    const updates = {
+                        name: formData.get('name'),
+                        sku: formData.get('sku'),
+                        category: formData.get('category'),
+                        price: parseFloat(formData.get('price')),
+                        stock: parseInt(formData.get('stock')),
+                        reorderPoint: parseInt(formData.get('reorderPoint')),
+                        description: formData.get('description')
+                    };
+                    dataManager.updateProduct(id, updates);
+                    closeModal('editProductModal');
+                    loadProductsTable();
+                    showNotification('Product updated successfully!');
+                });
+            }
+        }
+
+        function deleteProduct(id) {
+            if (confirm('Are you sure you want to delete this product?')) {
+                dataManager.deleteProduct(id);
+                loadProductsTable();
+                showNotification('Product deleted successfully!');
+            }
+        }
+
+        function bulkImport() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.csv';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const csv = e.target.result;
+                        const lines = csv.split('\n');
+                        let imported = 0;
+                        
+                        for (let i = 1; i < lines.length; i++) {
+                            const columns = lines[i].split(',');
+                            if (columns.length >= 4) {
+                                const product = {
+                                    sku: columns[0].trim(),
+                                    name: columns[1].trim(),
+                                    category: columns[2].trim(),
+                                    price: parseFloat(columns[3].trim()) || 0,
+                                    stock: parseInt(columns[4].trim()) || 0,
+                                    reorderPoint: parseInt(columns[5].trim()) || 10,
+                                    description: columns[6] ? columns[6].trim() : ''
+                                };
+                                dataManager.addProduct(product);
+                                imported++;
+                            }
+                        }
+                        showNotification(`Successfully imported ${imported} products!`);
+                        loadProductsTable();
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            input.click();
+        }
+
+        // Form handling
+        document.getElementById('addProductForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const product = {
+                sku: formData.get('sku'),
+                name: formData.get('name'),
+                category: formData.get('category'),
+                price: parseFloat(formData.get('price')),
+                stock: parseInt(formData.get('stock')),
+                reorderPoint: 10,
+                description: formData.get('description')
+            };
+            dataManager.addProduct(product);
+            closeModal('addProductModal');
+            this.reset();
+            loadProductsTable();
+            showNotification('Product added successfully!');
+        });
+
+        // Order Management Functions
+        function loadOrdersTable() {
+            const data = dataManager.getData();
+            const tbody = document.querySelector('#orders .table tbody');
+            if (tbody) {
+                tbody.innerHTML = '';
+                
+                data.orders.forEach(order => {
+                    const row = document.createElement('tr');
+                    const statusClass = order.status === 'Completed' ? 'badge-success' : 
+                                      order.status === 'Processing' ? 'badge-warning' : 'badge-danger';
+                    
+                    row.innerHTML = `
+                        <td>${order.id}</td>
+                        <td>${order.customer}</td>
+                        <td>${order.date}</td>
+                        <td>$${order.total.toFixed(2)}</td>
+                        <td><span class="badge ${statusClass}">${order.status}</span></td>
+                        <td>
+                            <button class="btn btn-primary" onclick="viewOrder('${order.id}')">View</button>
+                            <button class="btn btn-warning" onclick="editOrder('${order.id}')">Edit</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+        }
+
+        function viewOrder(orderId) {
+            const data = dataManager.getData();
+            const order = data.orders.find(o => o.id === orderId);
+            if (order) {
+                const modal = document.createElement('div');
+                modal.className = 'modal';
+                modal.id = 'viewOrderModal';
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <span class="close" onclick="closeModal('viewOrderModal')">&times;</span>
+                        <h2>Order Details - ${order.id}</h2>
+                        <div class="card">
+                            <h3>Customer Information</h3>
+                            <p><strong>Customer:</strong> ${order.customer}</p>
+                            <p><strong>Date:</strong> ${order.date}</p>
+                            <p><strong>Status:</strong> ${order.status}</p>
+                            <p><strong>Total:</strong> $${order.total.toFixed(2)}</p>
+                        </div>
+                        <div class="card">
+                            <h3>Order Items</h3>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Quantity</th>
+                                        <th>Price</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${order.items.map(item => `
+                                        <tr>
+                                            <td>${item.product}</td>
+                                            <td>${item.quantity}</td>
+                                            <td>$${item.price.toFixed(2)}</td>
+                                            <td>$${(item.quantity * item.price).toFixed(2)}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                        <button class="btn btn-secondary" onclick="closeModal('viewOrderModal')">Close</button>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+                modal.style.display = 'block';
+            }
+        }
+
+        function editOrder(orderId) {
+            const data = dataManager.getData();
+            const order = data.orders.find(o => o.id === orderId);
+            if (order) {
+                const modal = document.createElement('div');
+                modal.className = 'modal';
+                modal.id = 'editOrderModal';
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <span class="close" onclick="closeModal('editOrderModal')">&times;</span>
+                        <h2>Edit Order - ${order.id}</h2>
+                        <form id="editOrderForm">
+                            <input type="hidden" name="id" value="${order.id}">
+                            <div class="form-group">
+                                <label class="form-label">Customer Name</label>
+                                <input type="text" class="form-control" name="customer" value="${order.customer}" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Order Date</label>
+                                <input type="date" class="form-control" name="date" value="${order.date}" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Status</label>
+                                <select class="form-control" name="status" required>
+                                    <option value="Pending" ${order.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                                    <option value="Processing" ${order.status === 'Processing' ? 'selected' : ''}>Processing</option>
+                                    <option value="Completed" ${order.status === 'Completed' ? 'selected' : ''}>Completed</option>
+                                    <option value="Cancelled" ${order.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Total Amount</label>
+                                <input type="number" class="form-control" name="total" value="${order.total}" step="0.01" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Update Order</button>
+                            <button type="button" class="btn btn-secondary" onclick="closeModal('editOrderModal')">Cancel</button>
+                        </form>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+                modal.style.display = 'block';
+                
+                document.getElementById('editOrderForm').addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const formData = new FormData(this);
+                    const updates = {
+                        customer: formData.get('customer'),
+                        date: formData.get('date'),
+                        status: formData.get('status'),
+                        total: parseFloat(formData.get('total'))
+                    };
+                    dataManager.updateOrder(orderId, updates);
+                    closeModal('editOrderModal');
+                    loadOrdersTable();
+                    showNotification('Order updated successfully!');
+                });
+            }
+        }
+
+        function exportOrders() {
+            const data = dataManager.getData();
+            const csvContent = [
+                ['Order ID', 'Customer', 'Date', 'Total', 'Status'],
+                ...data.orders.map(order => [
+                    order.id,
+                    order.customer,
+                    order.date,
+                    order.total.toFixed(2),
+                    order.status
+                ])
+            ].map(row => row.join(',')).join('\n');
+            
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `orders_export_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            showNotification('Orders exported successfully!');
+        }
+
+        // Inventory Management Functions
+        function loadInventoryTable() {
+            const data = dataManager.getData();
+            const tbody = document.querySelector('#inventory .table tbody');
+            if (tbody) {
+                tbody.innerHTML = '';
+                
+                data.products.forEach(product => {
+                    const row = document.createElement('tr');
+                    const statusClass = product.stock <= product.reorderPoint ? 'badge-warning' : 'badge-success';
+                    const statusText = product.stock <= product.reorderPoint ? 'Low Stock' : 'In Stock';
+                    
+                    row.innerHTML = `
+                        <td>${product.name}</td>
+                        <td>${product.sku}</td>
+                        <td>${product.stock}</td>
+                        <td>${product.reorderPoint}</td>
+                        <td><span class="badge ${statusClass}">${statusText}</span></td>
+                        <td>
+                            <button class="btn btn-primary" onclick="adjustStock('${product.sku}')">Adjust</button>
+                            <button class="btn btn-success" onclick="reorder('${product.sku}')">Reorder</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+        }
+
+        function adjustStock(sku) {
+            const data = dataManager.getData();
+            const product = data.products.find(p => p.sku === sku);
+            if (product) {
+                const modal = document.createElement('div');
+                modal.className = 'modal';
+                modal.id = 'adjustStockModal';
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <span class="close" onclick="closeModal('adjustStockModal')">&times;</span>
+                        <h2>Adjust Stock - ${product.name}</h2>
+                        <form id="adjustStockForm">
+                            <input type="hidden" name="sku" value="${product.sku}">
+                            <div class="form-group">
+                                <label class="form-label">Current Stock: ${product.stock}</label>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Adjustment Type</label>
+                                <select class="form-control" name="adjustmentType" required>
+                                    <option value="add">Add Stock</option>
+                                    <option value="subtract">Subtract Stock</option>
+                                    <option value="set">Set Stock</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Quantity</label>
+                                <input type="number" class="form-control" name="quantity" required min="1">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Reason</label>
+                                <select class="form-control" name="reason" required>
+                                    <option value="received">Stock Received</option>
+                                    <option value="sold">Stock Sold</option>
+                                    <option value="damaged">Damaged Goods</option>
+                                    <option value="returned">Returned Goods</option>
+                                    <option value="adjustment">Manual Adjustment</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Notes</label>
+                                <textarea class="form-control" name="notes" rows="3"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Adjust Stock</button>
+                            <button type="button" class="btn btn-secondary" onclick="closeModal('adjustStockModal')">Cancel</button>
+                        </form>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+                modal.style.display = 'block';
+                
+                document.getElementById('adjustStockForm').addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const formData = new FormData(this);
+                    const adjustmentType = formData.get('adjustmentType');
+                    const quantity = parseInt(formData.get('quantity'));
+                    let newStock = product.stock;
+                    
+                    if (adjustmentType === 'add') {
+                        newStock += quantity;
+                    } else if (adjustmentType === 'subtract') {
+                        newStock -= quantity;
+                    } else if (adjustmentType === 'set') {
+                        newStock = quantity;
+                    }
+                    
+                    dataManager.updateProduct(product.id, { stock: newStock });
+                    closeModal('adjustStockModal');
+                    loadInventoryTable();
+                    showNotification(`Stock adjusted successfully! New stock: ${newStock}`);
+                });
+            }
+        }
+
+        function reorder(sku) {
+            const data = dataManager.getData();
+            const product = data.products.find(p => p.sku === sku);
+            if (product) {
+                const reorderQuantity = product.reorderPoint * 2;
+                const modal = document.createElement('div');
+                modal.className = 'modal';
+                modal.id = 'reorderModal';
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <span class="close" onclick="closeModal('reorderModal')">&times;</span>
+                        <h2>Create Reorder - ${product.name}</h2>
+                        <form id="reorderForm">
+                            <input type="hidden" name="sku" value="${product.sku}">
+                            <div class="form-group">
+                                <label class="form-label">Product: ${product.name}</label>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Current Stock: ${product.stock}</label>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Reorder Point: ${product.reorderPoint}</label>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Suggested Quantity: ${reorderQuantity}</label>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Reorder Quantity</label>
+                                <input type="number" class="form-control" name="quantity" value="${reorderQuantity}" required min="1">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Supplier</label>
+                                <input type="text" class="form-control" name="supplier" placeholder="Enter supplier name" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Expected Delivery Date</label>
+                                <input type="date" class="form-control" name="deliveryDate" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Create Reorder</button>
+                            <button type="button" class="btn btn-secondary" onclick="closeModal('reorderModal')">Cancel</button>
+                        </form>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+                modal.style.display = 'block';
+                
+                document.getElementById('reorderForm').addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const formData = new FormData(this);
+                    const reorder = {
+                        product: product.name,
+                        sku: product.sku,
+                        quantity: parseInt(formData.get('quantity')),
+                        supplier: formData.get('supplier'),
+                        deliveryDate: formData.get('deliveryDate'),
+                        status: 'Pending',
+                        date: new Date().toISOString().split('T')[0]
+                    };
+                    
+                    // Add to orders as purchase order
+                    dataManager.addOrder({
+                        customer: formData.get('supplier'),
+                        date: new Date().toISOString().split('T')[0],
+                        total: product.price * reorder.quantity,
+                        status: 'Pending',
+                        items: [{
+                            product: product.name,
+                            quantity: reorder.quantity,
+                            price: product.price
+                        }]
+                    });
+                    
+                    closeModal('reorderModal');
+                    showNotification(`Reorder created successfully for ${reorder.quantity} units!`);
+                });
+            }
+        }
+
+        function bulkStockUpdate() {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.id = 'bulkStockModal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <span class="close" onclick="closeModal('bulkStockModal')">&times;</span>
+                    <h2>Bulk Stock Update</h2>
+                    <p>Upload a CSV file with SKU and new stock quantities.</p>
+                    <p><strong>CSV Format:</strong> SKU, New Stock Quantity</p>
+                    <form id="bulkStockForm">
+                        <div class="form-group">
+                            <label class="form-label">Select CSV File</label>
+                            <input type="file" class="form-control" name="csvFile" accept=".csv" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update Stock</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeModal('bulkStockModal')">Cancel</button>
+                    </form>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            modal.style.display = 'block';
+            
+            document.getElementById('bulkStockForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const fileInput = this.querySelector('input[type="file"]');
+                const file = fileInput.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const csv = e.target.result;
+                        const lines = csv.split('\n');
+                        let updated = 0;
+                        
+                        for (let i = 1; i < lines.length; i++) {
+                            const columns = lines[i].split(',');
+                            if (columns.length >= 2) {
+                                const sku = columns[0].trim();
+                                const newStock = parseInt(columns[1].trim());
+                                const data = dataManager.getData();
+                                const product = data.products.find(p => p.sku === sku);
+                                if (product) {
+                                    dataManager.updateProduct(product.id, { stock: newStock });
+                                    updated++;
+                                }
+                            }
+                        }
+                        closeModal('bulkStockModal');
+                        loadInventoryTable();
+                        showNotification(`Successfully updated ${updated} products!`);
+                    };
+                    reader.readAsText(file);
+                }
+            });
+        }
+
+        function generateStockReport() {
+            const data = dataManager.getData();
+            const reportData = data.products.map(product => ({
+                'Product Name': product.name,
+                'SKU': product.sku,
+                'Current Stock': product.stock,
+                'Reorder Point': product.reorderPoint,
+                'Status': product.stock <= product.reorderPoint ? 'Low Stock' : 'In Stock',
+                'Value': (product.stock * product.price).toFixed(2)
+            }));
+            
+            const csvContent = [
+                Object.keys(reportData[0]),
+                ...reportData.map(row => Object.values(row))
+            ].map(row => row.join(',')).join('\n');
+            
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `stock_report_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            showNotification('Stock report generated successfully!');
+        }
+
+        // Reports Functions
+        function showReport(reportType) {
+            document.querySelectorAll('.report-section').forEach(section => section.style.display = 'none');
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            
+            if (reportType === 'sales') {
+                document.getElementById('salesReport').style.display = 'block';
+                event.target.classList.add('active');
+                loadSalesReportChart();
+            } else if (reportType === 'inventory') {
+                document.getElementById('inventoryReport').style.display = 'block';
+                event.target.classList.add('active');
+                loadInventoryReportChart();
+            } else {
+                alert('Report type: ' + reportType + ' - Coming soon!');
+            }
+        }
+
+        function loadSalesReportChart() {
+            const ctx = document.getElementById('salesReportChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                    datasets: [{
+                        label: 'Sales Revenue',
+                        data: [12000, 19000, 15000, 25000],
+                        backgroundColor: '#667eea'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        function loadInventoryReportChart() {
+            const ctx = document.getElementById('inventoryReportChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Inventory Value',
+                        data: [45000, 42000, 48000, 46000, 50000, 45678],
+                        borderColor: '#ff6b6b',
+                        backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        // Integration Functions
+        function configureShopify() {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.id = 'shopifyConfigModal';
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 800px;">
+                    <span class="close" onclick="closeModal('shopifyConfigModal')">&times;</span>
+                    <h2>🛒 Shopify Integration Setup</h2>
+                    <div class="card">
+                        <h3>Step 1: Get Your Shopify Credentials</h3>
+                        <p>To connect your Shopify store, you'll need:</p>
+                        <ul>
+                            <li>Shopify Store URL (e.g., yourstore.myshopify.com)</li>
+                            <li>API Key and Secret from your Shopify Partner Dashboard</li>
+                            <li>Webhook URL for real-time sync</li>
+                        </ul>
+                    </div>
+                    <form id="shopifyConfigForm">
+                        <div class="form-group">
+                            <label class="form-label">Shopify Store URL</label>
+                            <input type="text" class="form-control" name="storeUrl" placeholder="yourstore.myshopify.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">API Key</label>
+                            <input type="text" class="form-control" name="apiKey" placeholder="Your Shopify API Key" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">API Secret</label>
+                            <input type="password" class="form-control" name="apiSecret" placeholder="Your Shopify API Secret" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Webhook Secret</label>
+                            <input type="password" class="form-control" name="webhookSecret" placeholder="Your Webhook Secret" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Sync Settings</label>
+                            <div style="display: flex; gap: 20px; margin-top: 10px;">
+                                <label><input type="checkbox" name="syncProducts" checked> Sync Products</label>
+                                <label><input type="checkbox" name="syncOrders" checked> Sync Orders</label>
+                                <label><input type="checkbox" name="syncCustomers"> Sync Customers</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Sync Frequency</label>
+                            <select class="form-control" name="syncFrequency">
+                                <option value="realtime">Real-time (Webhooks)</option>
+                                <option value="hourly">Every Hour</option>
+                                <option value="daily">Daily</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Connect Shopify Store</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeModal('shopifyConfigModal')">Cancel</button>
+                    </form>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            modal.style.display = 'block';
+            
+            document.getElementById('shopifyConfigForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+                const config = {
+                    storeUrl: formData.get('storeUrl'),
+                    apiKey: formData.get('apiKey'),
+                    apiSecret: formData.get('apiSecret'),
+                    webhookSecret: formData.get('webhookSecret'),
+                    syncProducts: formData.get('syncProducts') === 'on',
+                    syncOrders: formData.get('syncOrders') === 'on',
+                    syncCustomers: formData.get('syncCustomers') === 'on',
+                    syncFrequency: formData.get('syncFrequency')
+                };
+                
+                // Simulate API call
+                setTimeout(() => {
+                    closeModal('shopifyConfigModal');
+                    showNotification('Shopify store connected successfully! 🎉');
+                    // Update integration status
+                    updateIntegrationStatus('shopify', 'connected');
+                }, 2000);
+            });
+        }
+
+        function syncShopify() {
+            showNotification('Starting Shopify sync...');
+            // Simulate sync process
+            setTimeout(() => {
+                showNotification('Shopify sync completed! 456 products and 23 orders synced.');
+            }, 3000);
+        }
+
+        function connectWooCommerce() {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.id = 'woocommerceConfigModal';
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 800px;">
+                    <span class="close" onclick="closeModal('woocommerceConfigModal')">&times;</span>
+                    <h2>🛍️ WooCommerce Integration Setup</h2>
+                    <div class="card">
+                        <h3>Step 1: Get Your WooCommerce Credentials</h3>
+                        <p>To connect your WooCommerce store, you'll need:</p>
+                        <ul>
+                            <li>WooCommerce Store URL</li>
+                            <li>Consumer Key and Consumer Secret from WooCommerce REST API</li>
+                            <li>WordPress Admin access</li>
+                        </ul>
+                    </div>
+                    <form id="woocommerceConfigForm">
+                        <div class="form-group">
+                            <label class="form-label">WooCommerce Store URL</label>
+                            <input type="url" class="form-control" name="storeUrl" placeholder="https://yourstore.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Consumer Key</label>
+                            <input type="text" class="form-control" name="consumerKey" placeholder="ck_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Consumer Secret</label>
+                            <input type="password" class="form-control" name="consumerSecret" placeholder="cs_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">API Version</label>
+                            <select class="form-control" name="apiVersion">
+                                <option value="wc/v3">WooCommerce API v3</option>
+                                <option value="wc/v2">WooCommerce API v2</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Sync Settings</label>
+                            <div style="display: flex; gap: 20px; margin-top: 10px;">
+                                <label><input type="checkbox" name="syncProducts" checked> Sync Products</label>
+                                <label><input type="checkbox" name="syncOrders" checked> Sync Orders</label>
+                                <label><input type="checkbox" name="syncCategories"> Sync Categories</label>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Connect WooCommerce Store</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeModal('woocommerceConfigModal')">Cancel</button>
+                    </form>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            modal.style.display = 'block';
+            
+            document.getElementById('woocommerceConfigForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+                const config = {
+                    storeUrl: formData.get('storeUrl'),
+                    consumerKey: formData.get('consumerKey'),
+                    consumerSecret: formData.get('consumerSecret'),
+                    apiVersion: formData.get('apiVersion'),
+                    syncProducts: formData.get('syncProducts') === 'on',
+                    syncOrders: formData.get('syncOrders') === 'on',
+                    syncCategories: formData.get('syncCategories') === 'on'
+                };
+                
+                setTimeout(() => {
+                    closeModal('woocommerceConfigModal');
+                    showNotification('WooCommerce store connected successfully! 🎉');
+                    updateIntegrationStatus('woocommerce', 'connected');
+                }, 2000);
+            });
+        }
+
+        function configureAmazon() {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.id = 'amazonConfigModal';
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 800px;">
+                    <span class="close" onclick="closeModal('amazonConfigModal')">&times;</span>
+                    <h2>📦 Amazon Integration Setup</h2>
+                    <div class="card">
+                        <h3>Step 1: Amazon Seller Central Setup</h3>
+                        <p>To connect your Amazon seller account, you'll need:</p>
+                        <ul>
+                            <li>Amazon Seller Central account</li>
+                            <li>MWS (Marketplace Web Service) credentials</li>
+                            <li>SP-API (Selling Partner API) access</li>
+                        </ul>
+                    </div>
+                    <form id="amazonConfigForm">
+                        <div class="form-group">
+                            <label class="form-label">Amazon Marketplace</label>
+                            <select class="form-control" name="marketplace" required>
+                                <option value="ATVPDKIKX0DER">Amazon.com (US)</option>
+                                <option value="A1PA6795UKMFR9">Amazon.de (Germany)</option>
+                                <option value="A1RKKUPIHCS9HS">Amazon.es (Spain)</option>
+                                <option value="A13V1IB3VIYZZH">Amazon.fr (France)</option>
+                                <option value="A21TJRUUN4KGV">Amazon.in (India)</option>
+                                <option value="A1VC38T7YXB528">Amazon.co.jp (Japan)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Seller ID</label>
+                            <input type="text" class="form-control" name="sellerId" placeholder="A1XXXXXXXXXXXXX" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">MWS Auth Token</label>
+                            <input type="text" class="form-control" name="authToken" placeholder="amzn.mws.xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Access Key ID</label>
+                            <input type="text" class="form-control" name="accessKeyId" placeholder="AKIAXXXXXXXXXXXXX" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Secret Access Key</label>
+                            <input type="password" class="form-control" name="secretAccessKey" placeholder="Your Secret Access Key" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Sync Settings</label>
+                            <div style="display: flex; gap: 20px; margin-top: 10px;">
+                                <label><input type="checkbox" name="syncInventory" checked> Sync Inventory</label>
+                                <label><input type="checkbox" name="syncOrders" checked> Sync Orders</label>
+                                <label><input type="checkbox" name="syncProducts"> Sync Product Listings</label>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Connect Amazon Account</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeModal('amazonConfigModal')">Cancel</button>
+                    </form>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            modal.style.display = 'block';
+            
+            document.getElementById('amazonConfigForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+                const config = {
+                    marketplace: formData.get('marketplace'),
+                    sellerId: formData.get('sellerId'),
+                    authToken: formData.get('authToken'),
+                    accessKeyId: formData.get('accessKeyId'),
+                    secretAccessKey: formData.get('secretAccessKey'),
+                    syncInventory: formData.get('syncInventory') === 'on',
+                    syncOrders: formData.get('syncOrders') === 'on',
+                    syncProducts: formData.get('syncProducts') === 'on'
+                };
+                
+                setTimeout(() => {
+                    closeModal('amazonConfigModal');
+                    showNotification('Amazon account connected successfully! 🎉');
+                    updateIntegrationStatus('amazon', 'connected');
+                }, 2000);
+            });
+        }
+
+        function syncAmazon() {
+            showNotification('Starting Amazon sync...');
+            setTimeout(() => {
+                showNotification('Amazon sync completed! 234 products and 12 orders synced.');
+            }, 3000);
+        }
+
+        function connectQuickBooks() {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.id = 'quickbooksConfigModal';
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 800px;">
+                    <span class="close" onclick="closeModal('quickbooksConfigModal')">&times;</span>
+                    <h2>💰 QuickBooks Integration Setup</h2>
+                    <div class="card">
+                        <h3>Step 1: QuickBooks Online Setup</h3>
+                        <p>To connect your QuickBooks account, you'll need:</p>
+                        <ul>
+                            <li>QuickBooks Online account</li>
+                            <li>Intuit Developer account</li>
+                            <li>OAuth 2.0 credentials</li>
+                        </ul>
+                    </div>
+                    <form id="quickbooksConfigForm">
+                        <div class="form-group">
+                            <label class="form-label">QuickBooks Environment</label>
+                            <select class="form-control" name="environment" required>
+                                <option value="sandbox">Sandbox (Testing)</option>
+                                <option value="production">Production</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Client ID</label>
+                            <input type="text" class="form-control" name="clientId" placeholder="Your QuickBooks Client ID" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Client Secret</label>
+                            <input type="password" class="form-control" name="clientSecret" placeholder="Your QuickBooks Client Secret" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Redirect URI</label>
+                            <input type="url" class="form-control" name="redirectUri" value="http://localhost:8000/api/integrations/quickbooks/callback" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Sync Settings</label>
+                            <div style="display: flex; gap: 20px; margin-top: 10px;">
+                                <label><input type="checkbox" name="syncCustomers" checked> Sync Customers</label>
+                                <label><input type="checkbox" name="syncInvoices" checked> Sync Invoices</label>
+                                <label><input type="checkbox" name="syncPayments"> Sync Payments</label>
+                                <label><input type="checkbox" name="syncItems"> Sync Items</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Sync Direction</label>
+                            <select class="form-control" name="syncDirection">
+                                <option value="bidirectional">Bidirectional (Import & Export)</option>
+                                <option value="import">Import Only (QuickBooks → Inventory)</option>
+                                <option value="export">Export Only (Inventory → QuickBooks)</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Connect QuickBooks</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeModal('quickbooksConfigModal')">Cancel</button>
+                    </form>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            modal.style.display = 'block';
+            
+            document.getElementById('quickbooksConfigForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+                const config = {
+                    environment: formData.get('environment'),
+                    clientId: formData.get('clientId'),
+                    clientSecret: formData.get('clientSecret'),
+                    redirectUri: formData.get('redirectUri'),
+                    syncCustomers: formData.get('syncCustomers') === 'on',
+                    syncInvoices: formData.get('syncInvoices') === 'on',
+                    syncPayments: formData.get('syncPayments') === 'on',
+                    syncItems: formData.get('syncItems') === 'on',
+                    syncDirection: formData.get('syncDirection')
+                };
+                
+                setTimeout(() => {
+                    closeModal('quickbooksConfigModal');
+                    showNotification('QuickBooks connected successfully! 🎉');
+                    updateIntegrationStatus('quickbooks', 'connected');
+                }, 2000);
+            });
+        }
+
+        function configureMailchimp() {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.id = 'mailchimpConfigModal';
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 800px;">
+                    <span class="close" onclick="closeModal('mailchimpConfigModal')">&times;</span>
+                    <h2>📧 Mailchimp Integration Setup</h2>
+                    <div class="card">
+                        <h3>Step 1: Mailchimp API Setup</h3>
+                        <p>To connect your Mailchimp account, you'll need:</p>
+                        <ul>
+                            <li>Mailchimp account</li>
+                            <li>API Key from Mailchimp Account Settings</li>
+                            <li>Audience ID for your mailing list</li>
+                        </ul>
+                    </div>
+                    <form id="mailchimpConfigForm">
+                        <div class="form-group">
+                            <label class="form-label">API Key</label>
+                            <input type="password" class="form-control" name="apiKey" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-us1" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Audience ID</label>
+                            <input type="text" class="form-control" name="audienceId" placeholder="xxxxxxxxxx" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Server Prefix</label>
+                            <input type="text" class="form-control" name="serverPrefix" placeholder="us1" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Sync Settings</label>
+                            <div style="display: flex; gap: 20px; margin-top: 10px;">
+                                <label><input type="checkbox" name="syncCustomers" checked> Sync Customers</label>
+                                <label><input type="checkbox" name="syncOrders"> Sync Order Data</label>
+                                <label><input type="checkbox" name="createSegments"> Create Customer Segments</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Customer Tags</label>
+                            <input type="text" class="form-control" name="customerTags" placeholder="vip, premium, new-customer">
+                            <small>Comma-separated tags to apply to synced customers</small>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Connect Mailchimp</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeModal('mailchimpConfigModal')">Cancel</button>
+                    </form>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            modal.style.display = 'block';
+            
+            document.getElementById('mailchimpConfigForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+                const config = {
+                    apiKey: formData.get('apiKey'),
+                    audienceId: formData.get('audienceId'),
+                    serverPrefix: formData.get('serverPrefix'),
+                    syncCustomers: formData.get('syncCustomers') === 'on',
+                    syncOrders: formData.get('syncOrders') === 'on',
+                    createSegments: formData.get('createSegments') === 'on',
+                    customerTags: formData.get('customerTags')
+                };
+                
+                setTimeout(() => {
+                    closeModal('mailchimpConfigModal');
+                    showNotification('Mailchimp connected successfully! 🎉');
+                    updateIntegrationStatus('mailchimp', 'connected');
+                }, 2000);
+            });
+        }
+
+        function updateIntegrationStatus(integration, status) {
+            // Update the integration status in the UI
+            const integrationItems = document.querySelectorAll('.integration-item');
+            integrationItems.forEach(item => {
+                const header = item.querySelector('.integration-header h4');
+                if (header && header.textContent.includes(integration.charAt(0).toUpperCase() + integration.slice(1))) {
+                    const badge = item.querySelector('.badge');
+                    if (badge) {
+                        badge.textContent = status === 'connected' ? 'Connected' : 'Pending Setup';
+                        badge.className = status === 'connected' ? 'badge badge-success' : 'badge badge-warning';
+                    }
+                }
+            });
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        // Settings Functions
+        function loadSettings() {
+            const data = dataManager.getData();
+            const settings = data.settings;
+            
+            // Load company settings
+            document.querySelector('input[name="companyName"]').value = settings.companyName;
+            document.querySelector('input[name="email"]').value = settings.email;
+            document.querySelector('input[name="phone"]').value = settings.phone;
+            
+            // Load inventory settings
+            document.querySelector('input[name="reorderPoint"]').value = settings.reorderPoint;
+            document.querySelector('input[name="lowStockThreshold"]').value = settings.lowStockThreshold;
+            document.querySelector('select[name="currency"]').value = settings.currency;
+            
+            // Load users table
+            loadUsersTable();
+        }
+
+        function loadUsersTable() {
+            const data = dataManager.getData();
+            const tbody = document.querySelector('#settings .table tbody');
+            if (tbody) {
+                tbody.innerHTML = '';
+                
+                data.users.forEach(user => {
+                    const row = document.createElement('tr');
+                    const statusClass = user.status === 'Active' ? 'badge-success' : 'badge-danger';
+                    
+                    row.innerHTML = `
+                        <td>${user.name}</td>
+                        <td>${user.email}</td>
+                        <td>${user.role}</td>
+                        <td><span class="badge ${statusClass}">${user.status}</span></td>
+                        <td>
+                            <button class="btn btn-primary" onclick="editUser(${user.id})">Edit</button>
+                            <button class="btn btn-danger" onclick="deleteUser(${user.id})">Delete</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+        }
+
+        function editUser(userId) {
+            const data = dataManager.getData();
+            const user = data.users.find(u => u.id === userId);
+            if (user) {
+                const modal = document.createElement('div');
+                modal.className = 'modal';
+                modal.id = 'editUserModal';
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <span class="close" onclick="closeModal('editUserModal')">&times;</span>
+                        <h2>Edit User</h2>
+                        <form id="editUserForm">
+                            <input type="hidden" name="id" value="${user.id}">
+                            <div class="form-group">
+                                <label class="form-label">Name</label>
+                                <input type="text" class="form-control" name="name" value="${user.name}" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" name="email" value="${user.email}" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Role</label>
+                                <select class="form-control" name="role" required>
+                                    <option value="Owner" ${user.role === 'Owner' ? 'selected' : ''}>Owner</option>
+                                    <option value="Manager" ${user.role === 'Manager' ? 'selected' : ''}>Manager</option>
+                                    <option value="Clerk" ${user.role === 'Clerk' ? 'selected' : ''}>Clerk</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Status</label>
+                                <select class="form-control" name="status" required>
+                                    <option value="Active" ${user.status === 'Active' ? 'selected' : ''}>Active</option>
+                                    <option value="Inactive" ${user.status === 'Inactive' ? 'selected' : ''}>Inactive</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Update User</button>
+                            <button type="button" class="btn btn-secondary" onclick="closeModal('editUserModal')">Cancel</button>
+                        </form>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+                modal.style.display = 'block';
+                
+                document.getElementById('editUserForm').addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const formData = new FormData(this);
+                    const updates = {
+                        name: formData.get('name'),
+                        email: formData.get('email'),
+                        role: formData.get('role'),
+                        status: formData.get('status')
+                    };
+                    dataManager.updateUser(userId, updates);
+                    closeModal('editUserModal');
+                    loadUsersTable();
+                    showNotification('User updated successfully!');
+                });
+            }
+        }
+
+        function deleteUser(userId) {
+            if (confirm('Are you sure you want to delete this user?')) {
+                dataManager.deleteUser(userId);
+                loadUsersTable();
+                showNotification('User deleted successfully!');
+            }
+        }
+
+        // Notification system
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #28a745;
+                color: white;
+                padding: 15px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 10000;
+                font-weight: 500;
+                animation: slideIn 0.3s ease;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Add CSS for notifications
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Settings form handlers
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboardCharts();
+            
+            // Company settings form
+            const companyForm = document.getElementById('companySettings');
+            if (companyForm) {
+                companyForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const formData = new FormData(this);
+                    const settings = {
+                        companyName: formData.get('companyName'),
+                        email: formData.get('email'),
+                        phone: formData.get('phone')
+                    };
+                    dataManager.updateSettings(settings);
+                    showNotification('Company settings updated successfully!');
+                });
+            }
+            
+            // Inventory settings form
+            const inventoryForm = document.getElementById('inventorySettings');
+            if (inventoryForm) {
+                inventoryForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const formData = new FormData(this);
+                    const settings = {
+                        reorderPoint: parseInt(formData.get('reorderPoint')),
+                        lowStockThreshold: parseInt(formData.get('lowStockThreshold')),
+                        currency: formData.get('currency')
+                    };
+                    dataManager.updateSettings(settings);
+                    showNotification('Inventory settings updated successfully!');
+                });
+            }
+            
+            // Notification settings form
+            const notificationForm = document.getElementById('notificationSettings');
+            if (notificationForm) {
+                notificationForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    showNotification('Notification settings updated successfully!');
+                });
+            }
+        });
+
+        // Create new order functionality
+        function createNewOrder() {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.id = 'createOrderModal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <span class="close" onclick="closeModal('createOrderModal')">&times;</span>
+                    <h2>Create New Order</h2>
+                    <form id="createOrderForm">
+                        <div class="form-group">
+                            <label class="form-label">Customer Name</label>
+                            <input type="text" class="form-control" name="customer" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Order Date</label>
+                            <input type="date" class="form-control" name="date" value="${new Date().toISOString().split('T')[0]}" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Product</label>
+                            <select class="form-control" name="product" required>
+                                <option value="">Select Product</option>
+                                ${dataManager.getData().products.map(product => 
+                                    `<option value="${product.id}">${product.name} ($${product.price})</option>`
+                                ).join('')}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Quantity</label>
+                            <input type="number" class="form-control" name="quantity" required min="1">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Status</label>
+                            <select class="form-control" name="status" required>
+                                <option value="Pending">Pending</option>
+                                <option value="Processing">Processing</option>
+                                <option value="Completed">Completed</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Create Order</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeModal('createOrderModal')">Cancel</button>
+                    </form>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            modal.style.display = 'block';
+            
+            document.getElementById('createOrderForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+                const productId = parseInt(formData.get('product'));
+                const quantity = parseInt(formData.get('quantity'));
+                const data = dataManager.getData();
+                const product = data.products.find(p => p.id === productId);
+                
+                if (product) {
+                    const order = {
+                        customer: formData.get('customer'),
+                        date: formData.get('date'),
+                        total: product.price * quantity,
+                        status: formData.get('status'),
+                        items: [{
+                            product: product.name,
+                            quantity: quantity,
+                            price: product.price
+                        }]
+                    };
+                    dataManager.addOrder(order);
+                    closeModal('createOrderModal');
+                    loadOrdersTable();
+                    showNotification('Order created successfully!');
+                }
+            });
+        }
+
+        // Add user functionality
+        function addUser() {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.id = 'addUserModal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <span class="close" onclick="closeModal('addUserModal')">&times;</span>
+                    <h2>Add New User</h2>
+                    <form id="addUserForm">
+                        <div class="form-group">
+                            <label class="form-label">Name</label>
+                            <input type="text" class="form-control" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Role</label>
+                            <select class="form-control" name="role" required>
+                                <option value="">Select Role</option>
+                                <option value="Owner">Owner</option>
+                                <option value="Manager">Manager</option>
+                                <option value="Clerk">Clerk</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Status</label>
+                            <select class="form-control" name="status" required>
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add User</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeModal('addUserModal')">Cancel</button>
+                    </form>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            modal.style.display = 'block';
+            
+            document.getElementById('addUserForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+                const user = {
+                    name: formData.get('name'),
+                    email: formData.get('email'),
+                    role: formData.get('role'),
+                    status: formData.get('status')
+                };
+                dataManager.addUser(user);
+                closeModal('addUserModal');
+                loadUsersTable();
+                showNotification('User added successfully!');
+            });
+        }
+    </script>
+</body>
+</html>

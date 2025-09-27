@@ -1,0 +1,197 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
+  ECR_REPOSITORY_BACKEND: production-inventory-saas-backend
+  ECR_REPOSITORY_FRONTEND: production-inventory-saas-frontend
+  ECR_REPOSITORY_ML: production-inventory-saas-ml
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_inventory_saas
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      
+      redis:
+        image: redis:7
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+
+    - name: Install Python dependencies
+      run: |
+        cd backend
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Install Node.js dependencies
+      run: |
+        cd frontend
+        npm ci
+
+    - name: Run backend tests
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_inventory_saas
+        REDIS_URL: redis://localhost:6379/0
+        SECRET_KEY: test-secret-key
+        DEBUG: True
+      run: |
+        cd backend
+        python manage.py test
+
+    - name: Run frontend tests
+      run: |
+        cd frontend
+        npm test -- --coverage --watchAll=false
+
+    - name: Run linting
+      run: |
+        cd backend
+        flake8 .
+        black --check .
+        isort --check-only .
+        
+        cd ../frontend
+        npm run lint
+
+  build-and-push:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Build, tag, and push backend image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: ${{ env.ECR_REPOSITORY_BACKEND }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        cd backend
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+    - name: Build, tag, and push frontend image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: ${{ env.ECR_REPOSITORY_FRONTEND }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        cd frontend
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+    - name: Build, tag, and push ML image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: ${{ env.ECR_REPOSITORY_ML }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        cd ml
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Update ECS service
+      run: |
+        aws ecs update-service \
+          --cluster production-inventory-saas \
+          --service production-backend \
+          --force-new-deployment
+
+    - name: Wait for deployment to complete
+      run: |
+        aws ecs wait services-stable \
+          --cluster production-inventory-saas \
+          --services production-backend
+
+  security-scan:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: 'trivy-results.sarif'

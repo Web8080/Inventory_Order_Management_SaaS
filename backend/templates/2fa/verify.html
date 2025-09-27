@@ -1,0 +1,216 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}Two-Factor Authentication Verification{% endblock %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <style>
+        .2fa-verify {
+            max-width: 500px;
+            margin: 100px auto;
+            padding: 40px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .2fa-verify h1 {
+            color: #2d3748;
+            margin-bottom: 20px;
+        }
+        
+        .2fa-verify p {
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #2d3748;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 18px;
+            text-align: center;
+            letter-spacing: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .backup-info {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        
+        .backup-info h4 {
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+        
+        .backup-info p {
+            color: #666;
+            margin-bottom: 0;
+            font-size: 14px;
+        }
+        
+        .error-message {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 2px solid #feb2b2;
+        }
+        
+        .success-message {
+            background: #c6f6d5;
+            color: #2f855a;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 2px solid #9ae6b4;
+        }
+        
+        .loading {
+            display: none;
+            color: #666;
+            margin-top: 10px;
+        }
+        
+        .spinner {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #4299e1;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="2fa-verify">
+    <h1>🔐 Two-Factor Authentication</h1>
+    <p>Please enter the 6-digit code from your authenticator app to complete the login process.</p>
+    
+    {% if messages %}
+        {% for message in messages %}
+            {% if message.tags == 'error' %}
+                <div class="error-message">{{ message }}</div>
+            {% elif message.tags == 'success' %}
+                <div class="success-message">{{ message }}</div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+    
+    <form method="post" id="2fa-form">
+        {% csrf_token %}
+        <input type="hidden" name="session_key" value="{{ session_key }}">
+        
+        <div class="form-group">
+            <label for="token">Verification Code</label>
+            <input type="text" id="token" name="token" maxlength="6" pattern="[0-9]{6}" required autocomplete="off">
+        </div>
+        
+        <button type="submit" class="btn" id="submit-btn">
+            Verify & Continue
+        </button>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            Verifying...
+        </div>
+    </form>
+    
+    <div class="backup-info">
+        <h4>💡 Need Help?</h4>
+        <p>If you can't access your authenticator app, you can use one of your backup codes instead. Enter the backup code in the verification field above.</p>
+    </div>
+    
+    <div style="margin-top: 30px;">
+        <a href="{% url 'admin:login' %}" style="color: #666; text-decoration: none;">
+            ← Back to Login
+        </a>
+    </div>
+</div>
+
+<script>
+// Auto-format the token input
+document.getElementById('token').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    if (value.length > 6) {
+        value = value.substring(0, 6);
+    }
+    e.target.value = value;
+});
+
+// Auto-submit when 6 digits are entered
+document.getElementById('token').addEventListener('input', function(e) {
+    if (e.target.value.length === 6) {
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('submit-btn').style.display = 'none';
+        setTimeout(() => {
+            e.target.form.submit();
+        }, 500);
+    }
+});
+
+// Show loading on form submit
+document.getElementById('2fa-form').addEventListener('submit', function(e) {
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('submit-btn').style.display = 'none';
+});
+
+// Focus on input when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('token').focus();
+});
+</script>
+{% endblock %}

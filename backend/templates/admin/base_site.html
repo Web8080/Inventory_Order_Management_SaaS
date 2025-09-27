@@ -1,0 +1,153 @@
+{% extends "admin/base.html" %}
+{% load static i18n %}
+
+{% block title %}{{ title }} | Inventory Management SaaS{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">
+        🏭 Inventory Management SaaS
+    </a>
+</h1>
+{% endblock %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static 'admin/css/custom_admin.css' %}">
+    <link rel="icon" type="image/x-icon" href="{% static 'admin/img/favicon.ico' %}">
+    <style>
+        /* Fix font colors for better visibility */
+        .form-row input, .form-row select, .form-row textarea {
+            color: #333 !important;
+        }
+        
+        .form-row label {
+            color: #333 !important;
+        }
+        
+        .help {
+            color: #666 !important;
+        }
+        
+        .field-box input, .field-box select, .field-box textarea {
+            color: #333 !important;
+        }
+        
+        .field-box label {
+            color: #333 !important;
+        }
+        
+        /* Fix readonly field colors */
+        .readonly {
+            color: #333 !important;
+            background-color: #f8f9fa !important;
+        }
+        
+        /* Fix field values that appear in white boxes */
+        .field-value {
+            color: #333 !important;
+            background-color: #f8f9fa !important;
+        }
+        
+        /* Fix specific field types */
+        .field-id, .field-created_at, .field-updated_at {
+            color: #333 !important;
+            background-color: #f8f9fa !important;
+        }
+        
+        /* Fix all input fields */
+        input[type="text"], input[type="email"], input[type="password"], 
+        input[type="number"], input[type="date"], input[type="datetime-local"],
+        select, textarea {
+            color: #333 !important;
+            background-color: white !important;
+        }
+        
+        /* Fix readonly inputs */
+        input[readonly], select[readonly], textarea[readonly] {
+            color: #333 !important;
+            background-color: #f8f9fa !important;
+        }
+        
+        /* Fix field display values */
+        .field-display {
+            color: #333 !important;
+        }
+        
+        /* User links styling */
+        #user-tools {
+            float: right;
+            padding: 0;
+            margin: 0 0 0 20px;
+            font-weight: 300;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            text-align: right;
+        }
+        
+        #user-tools a {
+            border-bottom: 1px solid rgba(255,255,255,0.25);
+            color: #fff;
+            text-decoration: none;
+        }
+        
+        #user-tools a:focus, #user-tools a:hover {
+            border-bottom-color: #fff;
+            color: #fff;
+        }
+        
+        #user-tools form {
+            display: inline;
+        }
+        
+        #user-tools button {
+            background: none;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(255,255,255,0.25);
+        }
+        
+        #user-tools button:hover {
+            border-bottom-color: #fff;
+        }
+    </style>
+{% endblock %}
+
+{% block nav-global %}
+    <div id="nav-global">
+        <a href="{% url 'admin:index' %}">🏠 Admin Home</a>
+        <a href="{% url 'admin_dashboard' %}">📊 Analytics Dashboard</a>
+        <a href="{% url 'admin_reports' %}">📈 Reports</a>
+        <a href="/api/docs/">📚 API Docs</a>
+        <a href="{% url 'admin:tenants_tenant_changelist' %}">🏢 Tenants</a>
+        <a href="{% url 'admin:products_product_changelist' %}">📦 Products</a>
+        <a href="{% url 'admin:inventory_stockitem_changelist' %}">📊 Inventory</a>
+        <a href="{% url 'admin:orders_order_changelist' %}">🛒 Orders</a>
+        <a href="{% url 'admin:integrations_integration_changelist' %}">🔗 Integrations</a>
+    </div>
+{% endblock %}
+
+{% block userlinks %}
+    {% if user.is_authenticated %}
+        <div id="user-tools">
+            {% url 'django-admindocs-docroot' as docsroot %}
+            {% if docsroot %}
+                <a href="{{ docsroot }}">{% trans 'Documentation' %}</a> /
+            {% endif %}
+            {% if user.has_usable_password %}
+                <a href="{% url 'admin:password_change' %}">{% trans 'Change password' %}</a> /
+            {% endif %}
+            <form id="logout-form" method="post" action="{% url 'admin:logout' %}">
+                {% csrf_token %}
+                <button type="submit">{% trans 'Log out' %}</button>
+            </form>
+            {% include "admin/color_theme_toggle.html" %}
+        </div>
+    {% endif %}
+{% endblock %}

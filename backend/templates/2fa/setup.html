@@ -1,0 +1,228 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}Setup Two-Factor Authentication{% endblock %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <style>
+        .2fa-setup {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .2fa-setup h1 {
+            color: #2d3748;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .qr-code {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .qr-code img {
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            background: white;
+        }
+        
+        .manual-key {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #4299e1;
+        }
+        
+        .manual-key code {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            word-break: break-all;
+        }
+        
+        .verification-form {
+            margin-top: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #2d3748;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .steps {
+            margin: 30px 0;
+        }
+        
+        .step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #f7fafc;
+            border-radius: 10px;
+        }
+        
+        .step-number {
+            background: #4299e1;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+        
+        .backup-codes {
+            background: #fff5f5;
+            border: 2px solid #fed7d7;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .backup-codes h3 {
+            color: #c53030;
+            margin-bottom: 15px;
+        }
+        
+        .backup-codes code {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin: 2px;
+            display: inline-block;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="2fa-setup">
+    <h1>🔐 Setup Two-Factor Authentication</h1>
+    
+    <div class="steps">
+        <div class="step">
+            <div class="step-number">1</div>
+            <div>
+                <strong>Install an Authenticator App</strong><br>
+                Download Google Authenticator, Authy, or similar app on your phone
+            </div>
+        </div>
+        
+        <div class="step">
+            <div class="step-number">2</div>
+            <div>
+                <strong>Scan the QR Code</strong><br>
+                Use your authenticator app to scan the QR code below
+            </div>
+        </div>
+        
+        <div class="step">
+            <div class="step-number">3</div>
+            <div>
+                <strong>Enter Verification Code</strong><br>
+                Enter the 6-digit code from your authenticator app
+            </div>
+        </div>
+    </div>
+    
+    <div class="qr-code">
+        <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code for 2FA Setup">
+    </div>
+    
+    <div class="manual-key">
+        <h3>Manual Entry Key</h3>
+        <p>If you can't scan the QR code, enter this key manually:</p>
+        <code>{{ secret_key }}</code>
+    </div>
+    
+    <form method="post" action="{% url 'verify_2fa_setup' %}" class="verification-form">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="token">Enter 6-digit verification code:</label>
+            <input type="text" id="token" name="token" maxlength="6" pattern="[0-9]{6}" required>
+        </div>
+        
+        <button type="submit" class="btn">Enable Two-Factor Authentication</button>
+    </form>
+    
+    <div style="text-align: center; margin-top: 30px;">
+        <a href="{% url 'admin:index' %}" style="color: #666; text-decoration: none;">
+            ← Back to Admin Panel
+        </a>
+    </div>
+</div>
+
+<script>
+// Auto-format the token input
+document.getElementById('token').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    if (value.length > 6) {
+        value = value.substring(0, 6);
+    }
+    e.target.value = value;
+});
+
+// Auto-submit when 6 digits are entered
+document.getElementById('token').addEventListener('input', function(e) {
+    if (e.target.value.length === 6) {
+        setTimeout(() => {
+            e.target.form.submit();
+        }, 500);
+    }
+});
+</script>
+{% endblock %}
