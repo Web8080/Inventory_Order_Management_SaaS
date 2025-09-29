@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Import Your Data - Inventory Management SaaS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fa;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .import-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .import-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .import-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .import-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .import-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .import-description {
+            color: #666;
+            margin-bottom: 20px;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .file-upload-area {
+            border: 2px dashed #e1e5e9;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .file-upload-area:hover {
+            border-color: #667eea;
+            background: #f0f2ff;
+        }
+
+        .file-upload-area.dragover {
+            border-color: #667eea;
+            background: #f0f2ff;
+        }
+
+        .upload-icon {
+            font-size: 32px;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .upload-text {
+            color: #333;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .upload-hint {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #666;
+            border: 2px solid #e1e5e9;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+        }
+
+        .btn-download {
+            background: #28a745;
+            color: white;
+            margin-right: 10px;
+        }
+
+        .btn-download:hover {
+            background: #218838;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e1e5e9;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #667eea;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .status-message {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .file-list {
+            margin-top: 20px;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .file-name {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .file-size {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .file-status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-processing {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .template-info {
+            background: #e8f4fd;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .template-info h4 {
+            color: #0066cc;
+            margin-bottom: 10px;
+        }
+
+        .template-info ul {
+            margin-left: 20px;
+            color: #333;
+        }
+
+        .template-info li {
+            margin-bottom: 5px;
+        }
+
+        .bulk-actions {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .import-summary {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-top: 30px;
+            display: none;
+        }
+
+        .summary-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Import Your Data</h1>
+            <p>Upload your existing data to get started quickly with our platform</p>
+        </div>
+
+        <div class="import-grid">
+            <!-- Products Import -->
+            <div class="import-card">
+                <div class="import-icon">📦</div>
+                <div class="import-title">Products</div>
+                <div class="import-description">
+                    Import your product catalog with details like SKU, name, price, and categories
+                </div>
+                
+                <div class="template-info">
+                    <h4>📋 Required Columns:</h4>
+                    <ul>
+                        <li>name (Product Name)</li>
+                        <li>sku (Product SKU)</li>
+                        <li>price (Selling Price)</li>
+                        <li>cost (Cost Price)</li>
+                        <li>category (Product Category)</li>
+                        <li>description (Optional)</li>
+                    </ul>
+                </div>
+
+                <div class="file-upload-area" data-type="products">
+                    <div class="upload-icon">📁</div>
+                    <div class="upload-text">Drop your CSV file here</div>
+                    <div class="upload-hint">or click to browse</div>
+                    <input type="file" class="file-input" accept=".csv" data-type="products">
+                </div>
+
+                <div class="file-list" id="products-files"></div>
+                <div class="progress-bar" id="products-progress">
+                    <div class="progress-fill"></div>
+                </div>
+                <div class="status-message" id="products-status"></div>
+
+                <div style="text-align: center;">
+                    <a href="/tenants/import/download-template/products/" class="btn btn-download">📥 Download Template</a>
+                    <button class="btn btn-primary" onclick="startImport('products')">🚀 Import Products</button>
+                </div>
+            </div>
+
+            <!-- Customers Import -->
+            <div class="import-card">
+                <div class="import-icon">👥</div>
+                <div class="import-title">Customers</div>
+                <div class="import-description">
+                    Import your customer database with contact information and addresses
+                </div>
+                
+                <div class="template-info">
+                    <h4>📋 Required Columns:</h4>
+                    <ul>
+                        <li>first_name</li>
+                        <li>last_name</li>
+                        <li>email</li>
+                        <li>phone (Optional)</li>
+                        <li>company (Optional)</li>
+                        <li>address (Optional)</li>
+                    </ul>
+                </div>
+
+                <div class="file-upload-area" data-type="customers">
+                    <div class="upload-icon">📁</div>
+                    <div class="upload-text">Drop your CSV file here</div>
+                    <div class="upload-hint">or click to browse</div>
+                    <input type="file" class="file-input" accept=".csv" data-type="customers">
+                </div>
+
+                <div class="file-list" id="customers-files"></div>
+                <div class="progress-bar" id="customers-progress">
+                    <div class="progress-fill"></div>
+                </div>
+                <div class="status-message" id="customers-status"></div>
+
+                <div style="text-align: center;">
+                    <a href="/tenants/import/download-template/customers/" class="btn btn-download">📥 Download Template</a>
+                    <button class="btn btn-primary" onclick="startImport('customers')">🚀 Import Customers</button>
+                </div>
+            </div>
+
+            <!-- Inventory Import -->
+            <div class="import-card">
+                <div class="import-icon">📈</div>
+                <div class="import-title">Inventory</div>
+                <div class="import-description">
+                    Import your current inventory levels and stock information
+                </div>
+                
+                <div class="template-info">
+                    <h4>📋 Required Columns:</h4>
+                    <ul>
+                        <li>product_sku (Must match imported products)</li>
+                        <li>quantity (Current stock level)</li>
+                        <li>reorder_point (Optional)</li>
+                        <li>cost_price (Optional)</li>
+                        <li>warehouse (Optional)</li>
+                    </ul>
+                </div>
+
+                <div class="file-upload-area" data-type="inventory">
+                    <div class="upload-icon">📁</div>
+                    <div class="upload-text">Drop your CSV file here</div>
+                    <div class="upload-hint">or click to browse</div>
+                    <input type="file" class="file-input" accept=".csv" data-type="inventory">
+                </div>
+
+                <div class="file-list" id="inventory-files"></div>
+                <div class="progress-bar" id="inventory-progress">
+                    <div class="progress-fill"></div>
+                </div>
+                <div class="status-message" id="inventory-status"></div>
+
+                <div style="text-align: center;">
+                    <a href="/tenants/import/download-template/inventory/" class="btn btn-download">📥 Download Template</a>
+                    <button class="btn btn-primary" onclick="startImport('inventory')">🚀 Import Inventory</button>
+                </div>
+            </div>
+
+            <!-- Suppliers Import -->
+            <div class="import-card">
+                <div class="import-icon">🏢</div>
+                <div class="import-title">Suppliers</div>
+                <div class="import-description">
+                    Import your supplier and vendor information
+                </div>
+                
+                <div class="template-info">
+                    <h4>📋 Required Columns:</h4>
+                    <ul>
+                        <li>name (Supplier Name)</li>
+                        <li>contact_person</li>
+                        <li>email</li>
+                        <li>phone (Optional)</li>
+                        <li>address (Optional)</li>
+                    </ul>
+                </div>
+
+                <div class="file-upload-area" data-type="suppliers">
+                    <div class="upload-icon">📁</div>
+                    <div class="upload-text">Drop your CSV file here</div>
+                    <div class="upload-hint">or click to browse</div>
+                    <input type="file" class="file-input" accept=".csv" data-type="suppliers">
+                </div>
+
+                <div class="file-list" id="suppliers-files"></div>
+                <div class="progress-bar" id="suppliers-progress">
+                    <div class="progress-fill"></div>
+                </div>
+                <div class="status-message" id="suppliers-status"></div>
+
+                <div style="text-align: center;">
+                    <a href="/tenants/import/download-template/suppliers/" class="btn btn-download">📥 Download Template</a>
+                    <button class="btn btn-primary" onclick="startImport('suppliers')">🚀 Import Suppliers</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bulk Actions -->
+        <div class="bulk-actions">
+            <button class="btn btn-primary" onclick="startBulkImport()" style="padding: 15px 30px; font-size: 16px;">
+                🚀 Import All Data
+            </button>
+            <a href="/" class="btn btn-secondary" style="padding: 15px 30px; font-size: 16px;">
+                ✅ Finish Setup
+            </a>
+        </div>
+
+        <!-- Import Summary -->
+        <div class="import-summary" id="import-summary">
+            <div class="summary-title">📊 Import Summary</div>
+            <div class="summary-stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="total-products">0</div>
+                    <div class="stat-label">Products Imported</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="total-customers">0</div>
+                    <div class="stat-label">Customers Imported</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="total-inventory">0</div>
+                    <div class="stat-label">Inventory Items</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="total-suppliers">0</div>
+                    <div class="stat-label">Suppliers Imported</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // File upload handling
+        document.querySelectorAll('.file-upload-area').forEach(area => {
+            const fileInput = area.querySelector('.file-input');
+            const type = area.dataset.type;
+            
+            area.addEventListener('click', () => fileInput.click());
+            
+            area.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                area.classList.add('dragover');
+            });
+            
+            area.addEventListener('dragleave', () => {
+                area.classList.remove('dragover');
+            });
+            
+            area.addEventListener('drop', (e) => {
+                e.preventDefault();
+                area.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                handleFiles(files, type);
+            });
+            
+            fileInput.addEventListener('change', (e) => {
+                handleFiles(e.target.files, type);
+            });
+        });
+
+        function handleFiles(files, type) {
+            const fileList = document.getElementById(`${type}-files`);
+            fileList.innerHTML = '';
+            
+            Array.from(files).forEach(file => {
+                if (file.type === 'text/csv' || file.name.endsWith('.csv')) {
+                    const fileItem = document.createElement('div');
+                    fileItem.className = 'file-item';
+                    fileItem.innerHTML = `
+                        <div>
+                            <div class="file-name">${file.name}</div>
+                            <div class="file-size">${(file.size / 1024).toFixed(1)} KB</div>
+                        </div>
+                        <div class="file-status status-pending">Ready</div>
+                    `;
+                    fileList.appendChild(fileItem);
+                } else {
+                    showStatus(type, 'error', 'Please upload CSV files only.');
+                }
+            });
+        }
+
+        function showStatus(type, status, message) {
+            const statusDiv = document.getElementById(`${type}-status`);
+            statusDiv.className = `status-message status-${status}`;
+            statusDiv.textContent = message;
+            statusDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        function updateProgress(type, percent) {
+            const progressBar = document.getElementById(`${type}-progress`);
+            const progressFill = progressBar.querySelector('.progress-fill');
+            
+            progressBar.style.display = 'block';
+            progressFill.style.width = `${percent}%`;
+        }
+
+        async function startImport(type) {
+            const fileList = document.getElementById(`${type}-files`);
+            const files = fileList.querySelectorAll('.file-item');
+            
+            if (files.length === 0) {
+                showStatus(type, 'error', 'Please select a file first.');
+                return;
+            }
+
+            showStatus(type, 'info', 'Starting import...');
+            updateProgress(type, 0);
+
+            try {
+                const formData = new FormData();
+                const fileInput = document.querySelector(`input[data-type="${type}"]`);
+                
+                if (fileInput.files.length > 0) {
+                    formData.append('file', fileInput.files[0]);
+                    formData.append('type', type);
+                }
+
+                const response = await fetch('/tenants/import/upload/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    },
+                    body: formData,
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    updateProgress(type, 100);
+                    showStatus(type, 'success', `Successfully imported ${result.count} ${type}.`);
+                    
+                    // Update file status
+                    files.forEach(file => {
+                        const status = file.querySelector('.file-status');
+                        status.className = 'file-status status-completed';
+                        status.textContent = 'Completed';
+                    });
+                    
+                    // Update summary
+                    updateSummary();
+                } else {
+                    showStatus(type, 'error', result.error || 'Import failed.');
+                }
+
+            } catch (error) {
+                showStatus(type, 'error', 'Import failed. Please try again.');
+            }
+        }
+
+        async function startBulkImport() {
+            const types = ['products', 'customers', 'inventory', 'suppliers'];
+            let totalImported = 0;
+
+            for (const type of types) {
+                const fileList = document.getElementById(`${type}-files`);
+                const files = fileList.querySelectorAll('.file-item');
+                
+                if (files.length > 0) {
+                    await startImport(type);
+                    totalImported++;
+                }
+            }
+
+            if (totalImported > 0) {
+                showStatus('bulk', 'success', `Bulk import completed! ${totalImported} file types processed.`);
+            } else {
+                showStatus('bulk', 'error', 'No files selected for import.');
+            }
+        }
+
+        function updateSummary() {
+            // This would typically fetch real data from the server
+            // For now, we'll simulate the update
+            document.getElementById('import-summary').style.display = 'block';
+        }
+
+        // Add CSRF token
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+        if (!csrfToken) {
+            const form = document.createElement('form');
+            form.innerHTML = '<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">';
+            document.body.appendChild(form);
+        }
+    </script>
+</body>
+</html>

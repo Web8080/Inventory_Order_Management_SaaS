@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Successful - Pending Admin Approval</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #ffc107, #ff9800);
+        }
+
+        .success-icon {
+            font-size: 80px;
+            color: #ffc107;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .title {
+            color: #333;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+
+        .approval-info {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .approval-badge {
+            background: linear-gradient(135deg, #ffc107, #ff9800);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        .approval-details {
+            color: #856404;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .process-steps {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 30px 0;
+            text-align: left;
+        }
+
+        .process-steps h3 {
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .step-number {
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .step.completed .step-number {
+            background: #28a745;
+        }
+
+        .step.current .step-number {
+            background: #ffc107;
+            animation: pulse 2s infinite;
+        }
+
+        .step-text {
+            color: #333;
+            font-size: 14px;
+        }
+
+        .contact-info {
+            background: #e8f4fd;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .contact-info h4 {
+            color: #0066cc;
+            margin-bottom: 10px;
+        }
+
+        .contact-info p {
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #666;
+            border: 2px solid #e1e5e9;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+            border-color: #dee2e6;
+        }
+
+        .status-check {
+            color: #667eea;
+            font-weight: 600;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="success-icon">⏳</div>
+        
+        <h1 class="title">Payment Successful!</h1>
+        <p class="subtitle">Your subscription is pending admin approval</p>
+
+        <div class="approval-info">
+            <div class="approval-badge">🔍 Pending Admin Review</div>
+            <div class="approval-details">
+                <strong>Thank you for your payment!</strong><br>
+                Your subscription has been processed and is now awaiting admin approval. 
+                You'll receive an email notification once your account is activated.
+            </div>
+        </div>
+
+        <div class="process-steps">
+            <h3>📋 What Happens Next?</h3>
+            
+            <div class="step completed">
+                <div class="step-number">1</div>
+                <div class="step-text">✅ Payment processed successfully</div>
+            </div>
+            
+            <div class="step current">
+                <div class="step-number">2</div>
+                <div class="step-text">⏳ Admin reviewing your subscription</div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-text">📧 You'll receive approval notification</div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">4</div>
+                <div class="step-text">🚀 Full access to your dashboard</div>
+            </div>
+        </div>
+
+        <div class="contact-info">
+            <h4>📞 Need Help?</h4>
+            <p><strong>Email:</strong> support@inventoryflow.com</p>
+            <p><strong>Phone:</strong> +1 (555) 123-4567</p>
+            <p><strong>Response Time:</strong> Usually within 24 hours</p>
+        </div>
+
+        <div>
+            <a href="http://localhost:8000/tenants/signin/" class="btn btn-primary">🔐 Check Status</a>
+            <a href="http://localhost:3002/contact.html" class="btn btn-secondary">📞 Contact Support</a>
+        </div>
+
+        <div class="status-check">
+            We'll notify you as soon as your account is approved! 🎉
+        </div>
+    </div>
+
+    <script>
+        // Auto-refresh status every 30 seconds
+        setInterval(() => {
+            fetch('/tenants/trial/status/')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.trial_info.status === 'active') {
+                        // Account approved, redirect to dashboard
+                        window.location.href = 'http://localhost:8000/?approved=true';
+                    }
+                })
+                .catch(error => console.log('Status check failed:', error));
+        }, 30000);
+    </script>
+</body>
+</html>

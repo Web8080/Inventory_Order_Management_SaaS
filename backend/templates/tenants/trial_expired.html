@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trial Expired - Upgrade Required</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .expired-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .expired-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #ff6b6b, #ee5a24);
+        }
+
+        .expired-icon {
+            font-size: 80px;
+            color: #ff6b6b;
+            margin-bottom: 20px;
+            animation: shake 2s infinite;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .expired-title {
+            color: #333;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .expired-subtitle {
+            color: #666;
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+
+        .tenant-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .tenant-name {
+            color: #667eea;
+            font-weight: 600;
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .trial-details {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .upgrade-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .upgrade-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .upgrade-description {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-bottom: 25px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .btn-primary {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .features-list {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 30px 0;
+            text-align: left;
+        }
+
+        .features-title {
+            color: #333;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            color: #666;
+        }
+
+        .feature-icon {
+            font-size: 20px;
+            margin-right: 15px;
+            color: #28a745;
+        }
+
+        .contact-section {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .contact-title {
+            color: #856404;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .contact-text {
+            color: #856404;
+            font-size: 14px;
+        }
+
+        .countdown {
+            background: #ff6b6b;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="expired-container">
+        <div class="expired-icon">⏰</div>
+        
+        <h1 class="expired-title">Trial Expired</h1>
+        <p class="expired-subtitle">Your free trial has ended. Upgrade to continue using InventoryFlow.</p>
+
+        <div class="tenant-info">
+            <div class="tenant-name">{{ tenant.name }}</div>
+            <div class="trial-details">
+                Trial ended on: {{ trial_status.trial_end|date:"F d, Y" }}<br>
+                Account created: {{ tenant.created_at|date:"F d, Y" }}
+            </div>
+        </div>
+
+        <div class="upgrade-section">
+            <h2 class="upgrade-title">🚀 Continue Your Journey</h2>
+            <p class="upgrade-description">
+                Don't lose access to your data and insights. Upgrade now to continue managing your inventory with AI-powered features.
+            </p>
+            
+            <a href="/tenants/payment/setup/" class="btn btn-primary">💳 Upgrade Now</a>
+            <a href="http://localhost:3002/contact.html" class="btn btn-secondary">📞 Contact Sales</a>
+        </div>
+
+        <div class="features-list">
+            <h3 class="features-title">What You'll Get with a Paid Plan:</h3>
+            
+            <div class="feature-item">
+                <span class="feature-icon">🤖</span>
+                <span>AI-Powered Demand Forecasting</span>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">📊</span>
+                <span>Advanced Analytics & Reporting</span>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">🔗</span>
+                <span>E-commerce Platform Integrations</span>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">⚡</span>
+                <span>Automated Reorder Management</span>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">👥</span>
+                <span>Multi-user Access & Permissions</span>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">📱</span>
+                <span>Mobile App Access</span>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">🛡️</span>
+                <span>Priority Support & Security</span>
+            </div>
+        </div>
+
+        <div class="contact-section">
+            <div class="contact-title">💬 Need Help?</div>
+            <div class="contact-text">
+                Our team is here to help you choose the right plan for your business. 
+                Contact us at <strong>support@inventoryflow.com</strong> or call <strong>+1 (555) 123-4567</strong>.
+            </div>
+        </div>
+
+        <div style="margin-top: 30px;">
+            <a href="/tenants/signin/" class="btn btn-secondary">🔐 Sign Out</a>
+        </div>
+    </div>
+
+    <script>
+        // Auto-refresh trial status every 30 seconds
+        setInterval(() => {
+            fetch('/tenants/trial/status/')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.trial_info.status === 'active') {
+                        // Trial reactivated, redirect to dashboard
+                        window.location.href = 'http://localhost:8000';
+                    }
+                })
+                .catch(error => console.log('Status check failed:', error));
+        }, 30000);
+
+        // Add some interactivity
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add click tracking for upgrade button
+            document.querySelector('.btn-primary').addEventListener('click', function() {
+                // Track upgrade button click
+                console.log('Upgrade button clicked');
+            });
+        });
+    </script>
+</body>
+</html>

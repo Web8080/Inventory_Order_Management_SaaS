@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choose Your Plan - Inventory Management SaaS</title>
+    <script src="https://js.stripe.com/v3/"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+
+        .plans-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .plan-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            position: relative;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .plan-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .plan-card.selected {
+            border: 3px solid #667eea;
+            transform: scale(1.05);
+        }
+
+        .plan-card.popular {
+            border: 3px solid #28a745;
+        }
+
+        .plan-card.popular::before {
+            content: 'Most Popular';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #28a745;
+            color: white;
+            padding: 5px 20px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .plan-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .plan-price {
+            font-size: 36px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .plan-period {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .plan-description {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .plan-features {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+
+        .plan-features li {
+            padding: 8px 0;
+            color: #333;
+            position: relative;
+            padding-left: 25px;
+        }
+
+        .plan-features li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .billing-toggle {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .toggle-container {
+            display: inline-flex;
+            background: white;
+            border-radius: 25px;
+            padding: 5px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .toggle-option {
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .toggle-option.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .payment-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .payment-section h3 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: #666;
+        }
+
+        .spinner {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .error {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .success {
+            color: #28a745;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Choose Your Plan</h1>
+            <p>Start your 14-day free trial today. No credit card required.</p>
+        </div>
+
+        <!-- Billing Toggle -->
+        <div class="billing-toggle">
+            <div class="toggle-container">
+                <div class="toggle-option active" data-cycle="monthly">Monthly</div>
+                <div class="toggle-option" data-cycle="yearly">Yearly (Save 20%)</div>
+            </div>
+        </div>
+
+        <!-- Plans Grid -->
+        <div class="plans-grid">
+            {% for plan in plans %}
+            <div class="plan-card {% if plan.name == 'professional' %}popular{% endif %}" data-plan-id="{{ plan.id }}">
+                <div class="plan-name">{{ plan.display_name }}</div>
+                <div class="plan-price">
+                    $<span class="monthly-price">{{ plan.price_monthly }}</span>
+                    <span class="yearly-price hidden">{{ plan.price_yearly }}</span>
+                </div>
+                <div class="plan-period">
+                    <span class="monthly-period">/month</span>
+                    <span class="yearly-period hidden">/year</span>
+                </div>
+                <div class="plan-description">{{ plan.description }}</div>
+                <ul class="plan-features">
+                    {% for feature in plan.features %}
+                    <li>{{ feature }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Payment Section -->
+        <div class="payment-section">
+            <h3>💳 Complete Your Setup</h3>
+            <form id="payment-form">
+                <div class="form-group">
+                    <label class="form-label">Card Information</label>
+                    <div id="card-element" class="form-control">
+                        <!-- Stripe Elements will create form elements here -->
+                    </div>
+                    <div id="card-errors" class="error"></div>
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="submit-button">
+                    <span class="btn-text">Start Free Trial</span>
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Processing...
+                    </div>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Stripe
+        const stripe = Stripe('{{ stripe_publishable_key }}');
+        const elements = stripe.elements();
+
+        // Create card element
+        const cardElement = elements.create('card', {
+            style: {
+                base: {
+                    fontSize: '16px',
+                    color: '#424770',
+                    '::placeholder': {
+                        color: '#aab7c4',
+                    },
+                },
+            },
+        });
+
+        cardElement.mount('#card-element');
+
+        // Handle billing cycle toggle
+        document.querySelectorAll('.toggle-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.toggle-option').forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+                
+                const cycle = this.dataset.cycle;
+                updatePricing(cycle);
+            });
+        });
+
+        function updatePricing(cycle) {
+            document.querySelectorAll('.plan-card').forEach(card => {
+                const monthlyPrice = card.querySelector('.monthly-price');
+                const yearlyPrice = card.querySelector('.yearly-price');
+                const monthlyPeriod = card.querySelector('.monthly-period');
+                const yearlyPeriod = card.querySelector('.yearly-period');
+                
+                if (cycle === 'yearly') {
+                    monthlyPrice.classList.add('hidden');
+                    yearlyPrice.classList.remove('hidden');
+                    monthlyPeriod.classList.add('hidden');
+                    yearlyPeriod.classList.remove('hidden');
+                } else {
+                    monthlyPrice.classList.remove('hidden');
+                    yearlyPrice.classList.add('hidden');
+                    monthlyPeriod.classList.remove('hidden');
+                    yearlyPeriod.classList.add('hidden');
+                }
+            });
+        }
+
+        // Handle plan selection
+        document.querySelectorAll('.plan-card').forEach(card => {
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+            });
+        });
+
+        // Handle form submission
+        const form = document.getElementById('payment-form');
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const selectedPlan = document.querySelector('.plan-card.selected');
+            const billingCycle = document.querySelector('.toggle-option.active').dataset.cycle;
+            
+            if (!selectedPlan) {
+                alert('Please select a plan first.');
+                return;
+            }
+
+            const submitButton = document.getElementById('submit-button');
+            const btnText = submitButton.querySelector('.btn-text');
+            const loading = submitButton.querySelector('.loading');
+            
+            // Show loading state
+            btnText.classList.add('hidden');
+            loading.style.display = 'inline-block';
+            submitButton.disabled = true;
+
+            try {
+                // Create payment method
+                const {error, paymentMethod} = await stripe.createPaymentMethod({
+                    type: 'card',
+                    card: cardElement,
+                });
+
+                if (error) {
+                    throw error;
+                }
+
+                // Create subscription
+                const response = await fetch('/tenants/payment/create-subscription/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    },
+                    body: new URLSearchParams({
+                        'plan_id': selectedPlan.dataset.planId,
+                        'billing_cycle': billingCycle,
+                        'payment_method_id': paymentMethod.id,
+                    }),
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Confirm payment
+                    const {error: confirmError} = await stripe.confirmCardPayment(
+                        result.client_secret
+                    );
+
+                    if (confirmError) {
+                        throw confirmError;
+                    }
+
+                    // Redirect to success page
+                    window.location.href = '/tenants/signup/success/';
+                } else {
+                    throw new Error(result.error);
+                }
+
+            } catch (error) {
+                document.getElementById('card-errors').textContent = error.message;
+            } finally {
+                // Hide loading state
+                btnText.classList.remove('hidden');
+                loading.style.display = 'none';
+                submitButton.disabled = false;
+            }
+        });
+
+        // Handle card errors
+        cardElement.on('change', ({error}) => {
+            const displayError = document.getElementById('card-errors');
+            if (error) {
+                displayError.textContent = error.message;
+            } else {
+                displayError.textContent = '';
+            }
+        });
+    </script>
+</body>
+</html>
