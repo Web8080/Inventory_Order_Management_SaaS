@@ -114,7 +114,7 @@ class PaymentMethod(models.Model):
     """Payment methods for tenants"""
     
     tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name='payment_methods')
-    stripe_payment_method_id = models.CharField(max_length=100, unique=True)
+    stripe_payment_method_id = models.CharField(max_length=100)
     type = models.CharField(max_length=20)  # card, bank_account, etc.
     is_default = models.BooleanField(default=False)
     
@@ -125,6 +125,9 @@ class PaymentMethod(models.Model):
     exp_year = models.IntegerField(null=True, blank=True)
     
     created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ['tenant', 'stripe_payment_method_id']
     
     def __str__(self):
         if self.brand and self.last4:
@@ -147,7 +150,7 @@ class Invoice(models.Model):
     subscription = models.ForeignKey(Subscription, on_delete=models.CASCADE, related_name='invoices')
     
     # Stripe information
-    stripe_invoice_id = models.CharField(max_length=100, unique=True)
+    stripe_invoice_id = models.CharField(max_length=100)
     stripe_payment_intent_id = models.CharField(max_length=100, blank=True)
     
     # Invoice details
@@ -167,6 +170,9 @@ class Invoice(models.Model):
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        unique_together = ['tenant', 'stripe_invoice_id']
     
     def __str__(self):
         return f"Invoice {self.stripe_invoice_id} - {self.tenant.name}"

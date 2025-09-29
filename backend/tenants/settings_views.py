@@ -21,13 +21,11 @@ def get_tenant_settings(request):
     settings, created = TenantSettings.objects.get_or_create(
         tenant=tenant,
         defaults={
-            'timezone': 'America/New_York',
-            'currency': 'USD',
-            'date_format': 'MM/DD/YYYY',
             'low_stock_threshold': 10,
-            'auto_reorder': False,
+            'auto_reorder_enabled': False,
             'email_notifications': True,
-            'sms_notifications': False,
+            'low_stock_alerts': True,
+            'order_notifications': True,
         }
     )
     
@@ -36,9 +34,9 @@ def get_tenant_settings(request):
             'id': tenant.id,
             'name': tenant.name,
             'slug': tenant.slug,
-            'industry': tenant.industry,
-            'company_size': tenant.company_size,
-            'website': tenant.website,
+            'plan': tenant.plan,
+            'timezone': tenant.timezone,
+            'currency': tenant.currency,
             'created_at': tenant.created_at.isoformat(),
         },
         'user': {
@@ -50,15 +48,17 @@ def get_tenant_settings(request):
             'role': getattr(request.user, 'role', 'owner'),
         },
         'settings': {
-            'timezone': settings.timezone,
-            'currency': settings.currency,
-            'date_format': settings.date_format,
             'low_stock_threshold': settings.low_stock_threshold,
-            'auto_reorder': settings.auto_reorder,
+            'auto_reorder_enabled': settings.auto_reorder_enabled,
+            'reorder_lead_time_days': settings.reorder_lead_time_days,
+            'ml_forecasting_enabled': settings.ml_forecasting_enabled,
+            'forecast_horizon_days': settings.forecast_horizon_days,
+            'confidence_threshold': settings.confidence_threshold,
+            'shopify_enabled': settings.shopify_enabled,
+            'woocommerce_enabled': settings.woocommerce_enabled,
             'email_notifications': settings.email_notifications,
-            'sms_notifications': settings.sms_notifications,
-            'default_reorder_point': settings.default_reorder_point,
-            'tax_rate': float(settings.tax_rate) if settings.tax_rate else 0.0,
+            'low_stock_alerts': settings.low_stock_alerts,
+            'order_notifications': settings.order_notifications,
         }
     })
 
@@ -72,9 +72,8 @@ def update_tenant_info(request):
     try:
         # Update tenant fields
         tenant.name = request.POST.get('company_name', tenant.name)
-        tenant.industry = request.POST.get('industry', tenant.industry)
-        tenant.company_size = request.POST.get('company_size', tenant.company_size)
-        tenant.website = request.POST.get('website', tenant.website)
+        tenant.timezone = request.POST.get('timezone', tenant.timezone)
+        tenant.currency = request.POST.get('currency', tenant.currency)
         tenant.save()
         
         return JsonResponse({
@@ -125,15 +124,17 @@ def update_tenant_settings(request):
         settings, created = TenantSettings.objects.get_or_create(tenant=tenant)
         
         # Update settings fields
-        settings.timezone = request.POST.get('timezone', settings.timezone)
-        settings.currency = request.POST.get('currency', settings.currency)
-        settings.date_format = request.POST.get('date_format', settings.date_format)
         settings.low_stock_threshold = int(request.POST.get('low_stock_threshold', settings.low_stock_threshold))
-        settings.auto_reorder = request.POST.get('auto_reorder') == 'true'
+        settings.auto_reorder_enabled = request.POST.get('auto_reorder_enabled') == 'true'
+        settings.reorder_lead_time_days = int(request.POST.get('reorder_lead_time_days', settings.reorder_lead_time_days))
+        settings.ml_forecasting_enabled = request.POST.get('ml_forecasting_enabled') == 'true'
+        settings.forecast_horizon_days = int(request.POST.get('forecast_horizon_days', settings.forecast_horizon_days))
+        settings.confidence_threshold = float(request.POST.get('confidence_threshold', settings.confidence_threshold))
+        settings.shopify_enabled = request.POST.get('shopify_enabled') == 'true'
+        settings.woocommerce_enabled = request.POST.get('woocommerce_enabled') == 'true'
         settings.email_notifications = request.POST.get('email_notifications') == 'true'
-        settings.sms_notifications = request.POST.get('sms_notifications') == 'true'
-        settings.default_reorder_point = int(request.POST.get('default_reorder_point', settings.default_reorder_point))
-        settings.tax_rate = float(request.POST.get('tax_rate', settings.tax_rate or 0))
+        settings.low_stock_alerts = request.POST.get('low_stock_alerts') == 'true'
+        settings.order_notifications = request.POST.get('order_notifications') == 'true'
         settings.save()
         
         return JsonResponse({
@@ -156,13 +157,11 @@ def settings_page(request):
     settings, created = TenantSettings.objects.get_or_create(
         tenant=tenant,
         defaults={
-            'timezone': 'America/New_York',
-            'currency': 'USD',
-            'date_format': 'MM/DD/YYYY',
             'low_stock_threshold': 10,
-            'auto_reorder': False,
+            'auto_reorder_enabled': False,
             'email_notifications': True,
-            'sms_notifications': False,
+            'low_stock_alerts': True,
+            'order_notifications': True,
         }
     )
     

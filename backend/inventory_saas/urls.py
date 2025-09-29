@@ -58,7 +58,7 @@ urlpatterns = [
     path('tenants/', include('tenants.urls')),
     # Handle signup without trailing slash
     path('tenants/signup', lambda request: redirect('/tenants/signup/'), name='signup_redirect'),
-    # path('api/products/', include('products.urls')),
+    path('products/', include('products.urls')),
     # path('api/orders/', include('orders.urls')),
     # path('api/inventory/', include('inventory.urls')),
     # path('api/integrations/', include('integrations.urls')),

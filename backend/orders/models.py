@@ -35,7 +35,7 @@ class Order(TenantAwareModel):
     ]
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    order_number = models.CharField(max_length=50, unique=True)
+    order_number = models.CharField(max_length=50)
     order_type = models.CharField(max_length=20, choices=ORDER_TYPES)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft')
     
@@ -103,6 +103,7 @@ class Order(TenantAwareModel):
     class Meta:
         db_table = 'orders'
         ordering = ['-created_at']
+        unique_together = ['tenant', 'order_number']
         indexes = [
             models.Index(fields=['order_type', 'status']),
             models.Index(fields=['order_date']),

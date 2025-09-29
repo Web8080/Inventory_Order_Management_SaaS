@@ -58,7 +58,10 @@ class ProductViewSet(viewsets.ModelViewSet):
     
     def get_queryset(self):
         """Filter products by tenant and add stock information"""
-        queryset = super().get_queryset()
+        if hasattr(self.request.user, 'tenant') and self.request.user.tenant:
+            queryset = Product.objects.filter(tenant=self.request.user.tenant)
+        else:
+            queryset = Product.objects.none()
         
         # Add current stock information
         for product in queryset:
@@ -122,6 +125,12 @@ class ProductVariantViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['product', 'is_active']
     search_fields = ['sku', 'name']
+    
+    def get_queryset(self):
+        """Filter variants by tenant"""
+        if hasattr(self.request.user, 'tenant') and self.request.user.tenant:
+            return ProductVariant.objects.filter(tenant=self.request.user.tenant)
+        return ProductVariant.objects.none()
 
 
 class ProductImageViewSet(viewsets.ModelViewSet):

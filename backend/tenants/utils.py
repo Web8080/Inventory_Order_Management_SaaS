@@ -93,6 +93,7 @@ def import_products(tenant, csv_reader):
                 
                 # Create product variant
                 ProductVariant.objects.create(
+                    tenant=tenant,
                     product=product,
                     sku=row.get('sku', f'PROD-{product.id}'),
                     name=row.get('name', 'Default Variant'),

@@ -34,8 +34,8 @@ def dashboard_data(request):
         
         daily_sales = OrderLine.objects.filter(
             order__tenant=tenant,
-            order__order_date__gte=day_start,
-            order__order_date__lt=day_end,
+            order__created_at__gte=day_start,
+            order__created_at__lt=day_end,
             order__status='completed'
         ).aggregate(total=Sum('line_total'))['total'] or 0
         
@@ -49,41 +49,44 @@ def dashboard_data(request):
     # Key metrics
     total_products = Product.objects.filter(tenant=tenant).count()
     total_orders = Order.objects.filter(tenant=tenant).count()
-    total_inventory_value = StockItem.objects.filter(tenant=tenant).aggregate(
-        total=Sum('quantity') * Sum('cost_price')
-    )['total'] or 0
+    # Total inventory value (sum of quantity * cost_price from variants)
+    total_inventory_value = 0
+    stock_items = StockItem.objects.filter(tenant=tenant).select_related('variant')
+    for item in stock_items:
+        if item.variant and item.variant.cost_price:
+            total_inventory_value += float(item.quantity * item.variant.cost_price)
     
     # Recent orders (last 7 days)
     recent_orders = Order.objects.filter(
         tenant=tenant,
-        order_date__gte=last_7_days
-    ).order_by('-order_date')[:5]
+        created_at__gte=last_7_days
+    ).order_by('-created_at')[:5]
     
     recent_orders_data = []
     for order in recent_orders:
         recent_orders_data.append({
             'id': order.id,
             'order_number': order.order_number,
-            'customer_name': f"{order.customer.first_name} {order.customer.last_name}" if order.customer else 'Unknown',
+            'customer_name': order.customer_name or 'Unknown',
             'total': float(order.total_amount),
             'status': order.status,
-            'date': order.order_date.strftime('%Y-%m-%d')
+            'date': order.created_at.strftime('%Y-%m-%d')
         })
     
     # Low stock items
     low_stock_items = StockItem.objects.filter(
         tenant=tenant,
         quantity__lte=10  # Assuming 10 is low stock threshold
-    ).select_related('product_variant__product')[:5]
+    ).select_related('variant__product')[:5]
     
     low_stock_data = []
     for item in low_stock_items:
         low_stock_data.append({
             'id': item.id,
-            'product_name': item.product_variant.product.name,
-            'sku': item.product_variant.sku,
+            'product_name': item.variant.product.name if item.variant else item.product.name,
+            'sku': item.variant.sku if item.variant else 'N/A',
             'quantity': item.quantity,
-            'reorder_point': item.reorder_point
+            'reorder_point': item.variant.reorder_point if item.variant else 10
         })
     
     # Top products (by sales)
@@ -91,7 +94,7 @@ def dashboard_data(request):
         order__tenant=tenant,
         order__status='completed'
     ).values(
-        'product_variant__product__name'
+        'variant__product__name'
     ).annotate(
         total_sales=Sum('line_total'),
         total_quantity=Sum('quantity')
@@ -100,7 +103,7 @@ def dashboard_data(request):
     top_products_data = []
     for product in top_products:
         top_products_data.append({
-            'name': product['product_variant__product__name'],
+            'name': product['variant__product__name'],
             'sales': float(product['total_sales']),
             'quantity': product['total_quantity']
         })
@@ -130,38 +133,34 @@ def products_data(request):
     """Get products data for the current tenant"""
     tenant = request.user.tenant
     
-    products = Product.objects.filter(tenant=tenant).select_related('category')
+    # Get all product variants with their products
+    variants = ProductVariant.objects.filter(
+        product__tenant=tenant
+    ).select_related('product', 'product__category')
+    
     products_data = []
     
-    for product in products:
-        # Get stock information
+    for variant in variants:
+        # Get stock information for this variant
         stock_items = StockItem.objects.filter(
-            product_variant__product=product,
+            variant=variant,
             tenant=tenant
         )
         total_stock = sum([item.quantity for item in stock_items])
-        
-        # Get variants
-        variants = ProductVariant.objects.filter(product=product, tenant=tenant)
-        variants_data = []
-        for variant in variants:
-            variants_data.append({
-                'id': variant.id,
-                'sku': variant.sku,
-                'name': variant.name,
-                'selling_price': float(variant.selling_price),
-                'cost_price': float(variant.cost_price)
-            })
+        reorder_point = stock_items.first().variant.reorder_point if stock_items.exists() and stock_items.first().variant else 10
         
         products_data.append({
-            'id': product.id,
-            'name': product.name,
-            'sku': product.sku,
-            'description': product.description,
-            'category': product.category.name if product.category else 'Uncategorized',
-            'brand': product.brand,
-            'total_stock': total_stock,
-            'variants': variants_data
+            'id': variant.id,
+            'sku': variant.sku,
+            'name': variant.name or variant.product.name,
+            'description': variant.product.description,
+            'category': variant.product.category.name if variant.product.category else 'Uncategorized',
+            'brand': 'N/A',  # Product model doesn't have brand field
+            'selling_price': float(variant.selling_price),
+            'cost_price': float(variant.cost_price),
+            'stock': total_stock,
+            'reorder_point': reorder_point,
+            'product_id': variant.product.id
         })
     
     return JsonResponse({
@@ -175,18 +174,18 @@ def orders_data(request):
     """Get orders data for the current tenant"""
     tenant = request.user.tenant
     
-    orders = Order.objects.filter(tenant=tenant).select_related('customer').order_by('-order_date')
+    orders = Order.objects.filter(tenant=tenant).order_by('-created_at')
     orders_data = []
     
     for order in orders:
         orders_data.append({
             'id': order.id,
             'order_number': order.order_number,
-            'customer_name': f"{order.customer.first_name} {order.customer.last_name}" if order.customer else 'Unknown',
-            'customer_email': order.customer.email if order.customer else '',
+            'customer_name': order.customer_name or 'Unknown',
+            'customer_email': order.customer_email or '',
             'total_amount': float(order.total_amount),
             'status': order.status,
-            'order_date': order.order_date.strftime('%Y-%m-%d'),
+            'order_date': order.created_at.strftime('%Y-%m-%d'),
             'shipping_amount': float(order.shipping_amount),
             'tax_amount': float(order.tax_amount)
         })
@@ -203,21 +202,21 @@ def inventory_data(request):
     tenant = request.user.tenant
     
     stock_items = StockItem.objects.filter(tenant=tenant).select_related(
-        'product_variant__product', 'warehouse'
+        'variant__product', 'warehouse'
     )
     inventory_data = []
     
     for item in stock_items:
         inventory_data.append({
             'id': item.id,
-            'product_name': item.product_variant.product.name,
-            'sku': item.product_variant.sku,
+            'product_name': item.variant.product.name if item.variant else item.product.name,
+            'sku': item.variant.sku if item.variant else 'N/A',
             'warehouse': item.warehouse.name,
             'quantity': item.quantity,
-            'reorder_point': item.reorder_point,
-            'cost_price': float(item.product_variant.cost_price),
-            'selling_price': float(item.product_variant.selling_price),
-            'location': item.location,
+            'reorder_point': item.variant.reorder_point if item.variant else 10,
+            'cost_price': float(item.variant.cost_price) if item.variant else 0.0,
+            'selling_price': float(item.variant.selling_price) if item.variant else 0.0,
+            'location': item.warehouse.name,
             'last_updated': item.last_updated.strftime('%Y-%m-%d %H:%M')
         })
     

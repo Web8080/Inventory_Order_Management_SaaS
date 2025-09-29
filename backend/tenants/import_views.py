@@ -50,13 +50,22 @@ def data_import_page(request):
 @require_http_methods(["POST"])
 def upload_csv(request):
     """Handle CSV file upload and import"""
+    print("=" * 50)
+    print("CSV UPLOAD REQUEST RECEIVED")
+    print("=" * 50)
+    
     try:
         if not hasattr(request.user, 'tenant') or not request.user.tenant:
+            print("ERROR: No tenant associated with user")
             return JsonResponse({'error': 'No tenant associated with your account.'}, status=400)
         
         tenant = request.user.tenant
         file = request.FILES.get('file')
         import_type = request.POST.get('type')
+        
+        print(f"Upload request - Tenant: {tenant.name}, File: {file.name if file else 'None'}, Type: {import_type}")
+        print(f"Request FILES: {list(request.FILES.keys())}")
+        print(f"Request POST: {dict(request.POST)}")
         
         if not file or not import_type:
             return JsonResponse({'error': 'Missing file or import type.'}, status=400)
@@ -66,10 +75,30 @@ def upload_csv(request):
         
         # Read and process the CSV file
         content = file.read().decode('utf-8')
+        print(f"CSV content length: {len(content)}")
+        print(f"CSV content preview: {content[:200]}...")
+        
+        # Create CSV reader and check content
         csv_reader = csv.DictReader(io.StringIO(content))
+        print(f"CSV headers: {csv_reader.fieldnames}")
+        
+        # Convert to list to check if we have any rows (this consumes the reader)
+        rows = list(csv_reader)
+        print(f"Number of CSV rows found: {len(rows)}")
+        if rows:
+            print(f"First row sample: {rows[0]}")
+        else:
+            print("No rows found in CSV!")
+            return JsonResponse({
+                'success': False,
+                'count': 0,
+                'message': 'No data rows found in CSV file.'
+            })
         
         # Process based on import type
         if import_type == 'products':
+            # Create a new reader from the content since the previous one was consumed
+            csv_reader = csv.DictReader(io.StringIO(content))
             count = import_products(tenant, csv_reader)
         elif import_type == 'customers':
             count = import_customers(tenant, csv_reader)
@@ -80,6 +109,8 @@ def upload_csv(request):
         else:
             return JsonResponse({'error': 'Invalid import type.'}, status=400)
         
+        print(f"Import result: {count} {import_type} imported")
+        
         return JsonResponse({
             'success': True,
             'count': count,
@@ -87,16 +118,22 @@ def upload_csv(request):
         })
         
     except Exception as e:
+        print(f"Upload error: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return JsonResponse({'error': f'Import failed: {str(e)}'}, status=500)
 
 
 def import_products(tenant, csv_reader):
     """Import products from CSV"""
     imported_count = 0
+    error_count = 0
     
     with transaction.atomic():
-        for row in csv_reader:
+        for row_num, row in enumerate(csv_reader, 1):
             try:
+                print(f"Processing row {row_num}: {row}")
+                
                 # Get or create category
                 category_name = row.get('category', 'General')
                 category, _ = Category.objects.get_or_create(
@@ -118,34 +155,51 @@ def import_products(tenant, csv_reader):
                     }
                 )
                 
-                # Create product
-                product = Product.objects.create(
+                # Get or create product
+                product, created = Product.objects.get_or_create(
                     tenant=tenant,
-                    name=row.get('name', 'Unnamed Product'),
-                    description=row.get('description', ''),
-                    category=category,
-                    supplier=supplier,
-                    is_active=True
+                    sku=row.get('sku', f'PROD-{row_num}'),
+                    defaults={
+                        'name': row.get('name', 'Unnamed Product'),
+                        'description': row.get('description', ''),
+                        'category': category,
+                        'supplier': supplier,
+                        'barcode': row.get('barcode', ''),
+                        'is_active': True
+                    }
                 )
+                if created:
+                    print(f"Created new product: {product.name} (ID: {product.id})")
+                else:
+                    print(f"Using existing product: {product.name} (ID: {product.id})")
                 
-                # Create product variant
-                ProductVariant.objects.create(
+                # Get or create product variant with a different SKU
+                variant_sku = f"{row.get('sku', f'PROD-{product.id}')}-VAR"
+                variant, variant_created = ProductVariant.objects.get_or_create(
+                    tenant=tenant,
                     product=product,
-                    sku=row.get('sku', f'PROD-{product.id}'),
-                    name=row.get('name', 'Default Variant'),
-                    selling_price=Decimal(row.get('price', '0.00')),
-                    cost_price=Decimal(row.get('cost', '0.00')),
-                    weight=float(row.get('weight', '0.0')),
-                    dimensions=row.get('dimensions', ''),
-                    is_active=True
+                    sku=variant_sku,
+                    defaults={
+                        'name': row.get('name', 'Default Variant'),
+                        'selling_price': Decimal(row.get('selling_price', row.get('price', '0.00'))),
+                        'cost_price': Decimal(row.get('cost_price', row.get('cost', '0.00'))),
+                        'is_active': True
+                    }
                 )
+                if variant_created:
+                    print(f"Created new variant: {variant.sku} (ID: {variant.id})")
+                else:
+                    print(f"Using existing variant: {variant.sku} (ID: {variant.id})")
                 
                 imported_count += 1
                 
             except Exception as e:
-                print(f"Error importing product row: {e}")
+                error_count += 1
+                print(f"Error importing product row {row_num}: {e}")
+                print(f"Row data: {row}")
                 continue
     
+    print(f"Import completed: {imported_count} products imported, {error_count} errors")
     return imported_count
 
 

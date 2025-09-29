@@ -80,7 +80,7 @@ class Product(TenantAwareModel):
     ]
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    sku = models.CharField(max_length=100, unique=True)
+    sku = models.CharField(max_length=100)
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
@@ -103,7 +103,7 @@ class Product(TenantAwareModel):
     # Product details
     weight = models.DecimalField(max_digits=8, decimal_places=3, null=True, blank=True)
     dimensions = models.CharField(max_length=100, blank=True, null=True)  # LxWxH
-    barcode = models.CharField(max_length=50, blank=True, null=True, unique=True)
+    barcode = models.CharField(max_length=50, blank=True, null=True)
     
     # Status
     is_active = models.BooleanField(default=True)
@@ -119,7 +119,10 @@ class Product(TenantAwareModel):
     class Meta:
         db_table = 'products'
         ordering = ['name']
-        unique_together = ['tenant', 'sku']
+        unique_together = [
+            ['tenant', 'sku'],
+            ['tenant', 'barcode']
+        ]
     
     def __str__(self):
         return f"{self.sku} - {self.name}"
