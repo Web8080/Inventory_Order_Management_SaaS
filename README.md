@@ -746,4 +746,4 @@ python manage.py check_trial_expiry
 
 **Built with ❤️ using Django, FastAPI, and modern ML technologies**
 
-*Last updated: December 19, 2024*
+*Last updated: September 29, 2025*
