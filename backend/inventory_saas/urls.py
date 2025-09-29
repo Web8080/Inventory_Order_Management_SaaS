@@ -16,7 +16,7 @@ Including another URLconf
 """
 
 from django.urls import path, include
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.conf import settings
 from django.conf.urls.static import static
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
@@ -25,9 +25,13 @@ from .admin_reports import admin_reports, export_sales_report, export_inventory_
 from .admin_index import custom_admin_index  # This will override the admin index
 from django.contrib import admin
 
+def serve_frontend(request):
+    """Serve the frontend index.html file"""
+    return render(request, 'index.html')
+
 urlpatterns = [
-    # Root URL - redirect to frontend
-    path("", lambda request: redirect('http://localhost:5173/'), name="home"),
+    # Root URL - serve frontend from Django
+    path("", serve_frontend, name="home"),
     
     # Custom admin views (must come before admin.site.urls)
     path("admin/dashboard/", admin_dashboard, name="admin_dashboard"),
@@ -48,6 +52,12 @@ urlpatterns = [
     
     # API Endpoints
     path('api/auth/', include('tenants.urls')),
+    path('api/ml/', include('ml_api.urls')),
+    
+    # Tenant sign-in
+    path('tenants/', include('tenants.urls')),
+    # Handle signup without trailing slash
+    path('tenants/signup', lambda request: redirect('/tenants/signup/'), name='signup_redirect'),
     # path('api/products/', include('products.urls')),
     # path('api/orders/', include('orders.urls')),
     # path('api/inventory/', include('inventory.urls')),

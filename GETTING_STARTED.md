@@ -309,3 +309,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **Happy Coding! 🚀**
 
 For more detailed information, check out the [Architecture Documentation](docs/ARCHITECTURE.md).
+

@@ -155,3 +155,4 @@ class ProductListSerializer(serializers.ModelSerializer):
             'cost_price', 'selling_price', 'current_stock',
             'is_low_stock', 'is_active', 'created_at'
         ]
+

@@ -14,3 +14,4 @@ urlpatterns = [
     path('adjust/', views.StockAdjustmentView.as_view(), name='stock_adjust'),
     path('low-stock/', views.LowStockView.as_view(), name='low_stock'),
 ]
+

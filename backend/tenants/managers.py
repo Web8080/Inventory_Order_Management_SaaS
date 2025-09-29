@@ -46,3 +46,4 @@ class TenantAwareModel(models.Model):
             if tenant:
                 self.tenant = tenant
         super().save(*args, **kwargs)
+

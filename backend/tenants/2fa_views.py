@@ -199,3 +199,4 @@ def create_2fa_session(user):
     )
     
     return two_fa_session
+

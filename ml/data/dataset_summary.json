@@ -1,0 +1,165 @@
+{
+  "generated_at": "2025-09-29T14:48:41.421742",
+  "datasets": {
+    "sales": {
+      "records": 18219,
+      "columns": [
+        "date",
+        "tenant_id",
+        "tenant_name",
+        "product_id",
+        "product_name",
+        "product_sku",
+        "category",
+        "supplier",
+        "quantity_sold",
+        "unit_price",
+        "revenue",
+        "cost_price",
+        "profit",
+        "order_number",
+        "customer_name",
+        "order_status",
+        "payment_status",
+        "demand_pattern",
+        "business_type"
+      ],
+      "file_path": "ml/data/sales_dataset.csv"
+    },
+    "inventory": {
+      "records": 18275,
+      "columns": [
+        "date",
+        "tenant_id",
+        "tenant_name",
+        "product_id",
+        "product_name",
+        "product_sku",
+        "warehouse_id",
+        "warehouse_name",
+        "stock_level",
+        "reserved_quantity",
+        "available_quantity",
+        "reorder_point",
+        "reorder_quantity",
+        "is_low_stock",
+        "cost_price",
+        "selling_price",
+        "inventory_value",
+        "demand_pattern",
+        "business_type"
+      ],
+      "file_path": "ml/data/inventory_dataset.csv"
+    },
+    "transactions": {
+      "records": 5921,
+      "columns": [
+        "date",
+        "tenant_id",
+        "product_id",
+        "warehouse_id",
+        "transaction_type",
+        "quantity",
+        "reason",
+        "reference_id",
+        "reference_type",
+        "notes",
+        "cost_price",
+        "total_value"
+      ],
+      "file_path": "ml/data/transactions_dataset.csv"
+    },
+    "external_factors": {
+      "records": 731,
+      "columns": [
+        "date",
+        "temperature",
+        "precipitation",
+        "economic_index",
+        "marketing_spend",
+        "competitor_activity",
+        "social_sentiment",
+        "supply_disruption",
+        "is_weekend",
+        "is_holiday",
+        "is_month_end",
+        "is_quarter_end"
+      ],
+      "file_path": "ml/data/external_factors_dataset.csv"
+    },
+    "tenant_metrics": {
+      "records": 5,
+      "columns": [
+        "tenant_id",
+        "tenant_name",
+        "total_revenue",
+        "total_orders",
+        "avg_order_value",
+        "customer_count",
+        "product_count",
+        "inventory_value",
+        "profit_margin",
+        "customer_satisfaction",
+        "order_fulfillment_rate",
+        "inventory_turnover",
+        "days_sales_outstanding"
+      ],
+      "file_path": "ml/data/tenant_metrics_dataset.csv"
+    },
+    "product_analytics": {
+      "records": 25,
+      "columns": [
+        "product_id",
+        "product_name",
+        "product_sku",
+        "tenant_id",
+        "tenant_name",
+        "category",
+        "total_sold",
+        "total_revenue",
+        "avg_daily_sales",
+        "profit_margin",
+        "total_profit",
+        "price_elasticity",
+        "market_share",
+        "customer_rating",
+        "return_rate",
+        "demand_pattern",
+        "business_type"
+      ],
+      "file_path": "ml/data/product_analytics_dataset.csv"
+    },
+    "demand_patterns": {
+      "records": 18275,
+      "columns": [
+        "date",
+        "product_id",
+        "product_name",
+        "tenant_id",
+        "demand",
+        "demand_pattern",
+        "business_type",
+        "price",
+        "cost",
+        "profit_margin",
+        "day_of_week",
+        "month",
+        "quarter",
+        "is_weekend",
+        "is_holiday",
+        "is_month_end"
+      ],
+      "file_path": "ml/data/demand_patterns_dataset.csv"
+    }
+  },
+  "total_records": 61451,
+  "date_range": {
+    "start": "2023-09-30",
+    "end": "2025-10-03"
+  },
+  "tenants": 5,
+  "products": 25,
+  "categories": 10,
+  "suppliers": 10,
+  "warehouses": 5
+}

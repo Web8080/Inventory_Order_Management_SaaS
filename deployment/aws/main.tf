@@ -617,3 +617,4 @@ output "ecr_frontend_url" {
 output "ecr_ml_url" {
   value = aws_ecr_repository.ml.repository_url
 }
+

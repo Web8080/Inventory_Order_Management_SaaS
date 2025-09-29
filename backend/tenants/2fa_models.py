@@ -113,3 +113,4 @@ class TwoFactorSession(TenantAwareModel):
         if not self.expires_at:
             self.expires_at = timezone.now() + timezone.timedelta(minutes=30)
         super().save(*args, **kwargs)
+

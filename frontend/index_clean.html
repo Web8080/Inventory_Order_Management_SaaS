@@ -1,0 +1,811 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Management SaaS</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f7fa; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.1); }
+        .nav { background: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .nav-buttons { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+        .nav-btn { padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s ease; }
+        .nav-btn.active { background: #667eea; color: white; }
+        .nav-btn:not(.active) { background: #f8f9fa; color: #495057; }
+        .nav-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .page { display: none; }
+        .page.active { display: block; }
+        .card { background: white; padding: 25px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 25px; border-radius: 15px; text-align: center; }
+        .stat-number { font-size: 2.5em; font-weight: bold; margin-bottom: 10px; }
+        .stat-label { font-size: 1.1em; opacity: 0.9; }
+        .chart-container { position: relative; height: 400px; margin: 20px 0; }
+        .table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .table th, .table td { padding: 15px; text-align: left; border-bottom: 1px solid #dee2e6; }
+        .table th { background: #f8f9fa; font-weight: 600; }
+        .table tr:hover { background: #f8f9fa; }
+        .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; margin: 5px; transition: all 0.3s ease; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-warning { background: #ffc107; color: black; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; margin-bottom: 8px; font-weight: 600; color: #495057; }
+        .form-control { width: 100%; padding: 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 16px; transition: border-color 0.3s ease; }
+        .form-control:focus { outline: none; border-color: #667eea; }
+        .alert { padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        .alert-danger { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .alert-info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.8em; font-weight: 600; }
+        .badge-success { background: #d4edda; color: #155724; }
+        .badge-warning { background: #fff3cd; color: #856404; }
+        .badge-danger { background: #f8d7da; color: #721c24; }
+        .ml-insights { background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); color: white; padding: 20px; border-radius: 15px; margin: 20px 0; }
+        .insight-item { background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏢 Inventory Management SaaS</h1>
+            <p>Multi-tenant inventory and order management with AI-powered insights</p>
+        </div>
+
+        <div class="nav">
+            <div class="nav-buttons">
+                <button class="nav-btn active" onclick="showPage('dashboard')">📊 Dashboard</button>
+                <button class="nav-btn" onclick="showPage('products')">📦 Products</button>
+                <button class="nav-btn" onclick="showPage('orders')">🛒 Orders</button>
+                <button class="nav-btn" onclick="showPage('inventory')">📈 Inventory</button>
+                <button class="nav-btn" onclick="showPage('reports')">📋 Reports</button>
+                <button class="nav-btn" onclick="showPage('integrations')">🔗 Integrations</button>
+                <button class="nav-btn" onclick="showPage('ml')">🤖 AI Insights</button>
+                <button class="nav-btn" onclick="showPage('settings')">⚙️ Settings</button>
+            </div>
+        </div>
+
+        <!-- Dashboard Page -->
+        <div id="dashboard" class="page active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">1,247</div>
+                    <div class="stat-label">Total Products</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">3,456</div>
+                    <div class="stat-label">Total Orders</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">$89,234</div>
+                    <div class="stat-label">Total Revenue</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">156</div>
+                    <div class="stat-label">Low Stock Items</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>📊 Sales Analytics</h2>
+                <div class="chart-container">
+                    <canvas id="salesChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>📦 Product Distribution</h2>
+                <div class="chart-container">
+                    <canvas id="productsChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Products Page -->
+        <div id="products" class="page">
+            <div class="card">
+                <h2>📦 Product Management</h2>
+                <button class="btn btn-primary" onclick="addProduct()">+ Add New Product</button>
+                <button class="btn btn-success" onclick="bulkImport()">📥 Bulk Import</button>
+                
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Product Name</th>
+                            <th>SKU</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>iPhone 15 Pro</td>
+                            <td>IPH15-128-BLK</td>
+                            <td>Electronics</td>
+                            <td>$999.00</td>
+                            <td>45</td>
+                            <td><span class="badge badge-success">In Stock</span></td>
+                            <td>
+                                <button class="btn btn-primary" onclick="editProduct(1)">Edit</button>
+                                <button class="btn btn-danger" onclick="deleteProduct(1)">Delete</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>MacBook Pro M3</td>
+                            <td>MBP-M3-512-SLV</td>
+                            <td>Electronics</td>
+                            <td>$1,999.00</td>
+                            <td>8</td>
+                            <td><span class="badge badge-warning">Low Stock</span></td>
+                            <td>
+                                <button class="btn btn-primary" onclick="editProduct(2)">Edit</button>
+                                <button class="btn btn-danger" onclick="deleteProduct(2)">Delete</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Orders Page -->
+        <div id="orders" class="page">
+            <div class="card">
+                <h2>🛒 Order Management</h2>
+                <button class="btn btn-primary" onclick="createNewOrder()">+ Create New Order</button>
+                <button class="btn btn-success" onclick="exportOrders()">📥 Export Orders</button>
+                
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Date</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>ORD-2024-001</td>
+                            <td>John Doe</td>
+                            <td>2024-01-15</td>
+                            <td>$1,999.00</td>
+                            <td><span class="badge badge-success">Completed</span></td>
+                            <td>
+                                <button class="btn btn-primary" onclick="viewOrder('ORD-2024-001')">View</button>
+                                <button class="btn btn-warning" onclick="editOrder('ORD-2024-001')">Edit</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>ORD-2024-002</td>
+                            <td>Jane Smith</td>
+                            <td>2024-01-16</td>
+                            <td>$999.00</td>
+                            <td><span class="badge badge-warning">Processing</span></td>
+                            <td>
+                                <button class="btn btn-primary" onclick="viewOrder('ORD-2024-002')">View</button>
+                                <button class="btn btn-warning" onclick="editOrder('ORD-2024-002')">Edit</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Inventory Page -->
+        <div id="inventory" class="page">
+            <div class="card">
+                <h2>📈 Inventory Management</h2>
+                <button class="btn btn-primary" onclick="adjustStock()">📊 Adjust Stock</button>
+                <button class="btn btn-success" onclick="bulkStockUpdate()">📥 Bulk Update</button>
+                <button class="btn btn-warning" onclick="generateStockReport()">📋 Stock Report</button>
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>SKU</th>
+                            <th>Current Stock</th>
+                            <th>Reorder Point</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>iPhone 15 Pro</td>
+                            <td>IPH15-128-BLK</td>
+                            <td>45</td>
+                            <td>10</td>
+                            <td><span class="badge badge-success">In Stock</span></td>
+                            <td>
+                                <button class="btn btn-primary" onclick="adjustStock('IPH15-128-BLK')">Adjust</button>
+                                <button class="btn btn-success" onclick="reorder('IPH15-128-BLK')">Reorder</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>MacBook Pro M3</td>
+                            <td>MBP-M3-512-SLV</td>
+                            <td>8</td>
+                            <td>15</td>
+                            <td><span class="badge badge-warning">Low Stock</span></td>
+                            <td>
+                                <button class="btn btn-primary" onclick="adjustStock('MBP-M3-512-SLV')">Adjust</button>
+                                <button class="btn btn-success" onclick="reorder('MBP-M3-512-SLV')">Reorder</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Reports Page -->
+        <div id="reports" class="page">
+            <div class="card">
+                <h2>📋 Reports & Analytics</h2>
+                <div class="nav-buttons">
+                    <button class="nav-btn active" onclick="showReport('sales')">📊 Sales Report</button>
+                    <button class="nav-btn" onclick="showReport('inventory')">📦 Inventory Report</button>
+                    <button class="nav-btn" onclick="showReport('performance')">📈 Performance Report</button>
+                    <button class="nav-btn" onclick="showReport('financial')">💰 Financial Report</button>
+                </div>
+
+                <div id="salesReport" class="report-section">
+                    <h3>📊 Sales Report</h3>
+                    <p>Total Sales: $89,234 | Orders: 3,456 | Average Order Value: $25.83</p>
+                    <button class="btn btn-primary" onclick="exportSalesReport()">📥 Export Sales Report</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Integrations Page -->
+        <div id="integrations" class="page">
+            <div class="card">
+                <h2>🔗 Integrations</h2>
+                
+                <div class="integration-item">
+                    <h3>🛒 Shopify</h3>
+                    <p>Last sync: 2 minutes ago | Products: 456 | Orders: 23</p>
+                    <button class="btn btn-primary" onclick="configureShopify()">Configure</button>
+                    <button class="btn btn-warning" onclick="syncShopify()">Sync Now</button>
+                </div>
+
+                <div class="integration-item">
+                    <h3>🛒 WooCommerce</h3>
+                    <p>Connect your WooCommerce store to sync products and orders</p>
+                    <button class="btn btn-primary" onclick="connectWooCommerce()">Connect</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Insights Page -->
+        <div id="ml" class="page">
+            <div class="card">
+                <h2>🤖 AI-Powered Insights</h2>
+                <p>Leverage machine learning to optimize your inventory and predict future trends.</p>
+
+                <!-- AI Model Status -->
+                <div class="ml-insights" id="aiStatus">
+                    <h3>🧠 AI Model Status</h3>
+                    <div class="insight-item">
+                        <strong>Models Loaded:</strong> <span id="modelsLoaded">Loading...</span>
+                    </div>
+                    <div class="insight-item">
+                        <strong>Forecasting Models:</strong> <span id="forecastingModels">Loading...</span>
+                    </div>
+                    <div class="insight-item">
+                        <strong>Products Optimized:</strong> <span id="productsOptimized">Loading...</span>
+                    </div>
+                    <div class="insight-item">
+                        <strong>Model Accuracy:</strong> <span id="modelAccuracy">Loading...</span>
+                    </div>
+                </div>
+
+                <!-- Demand Prediction Section -->
+                <div class="card">
+                    <h3>📈 Demand Prediction</h3>
+                    <div class="form-group">
+                        <label class="form-label">Select Product for Prediction:</label>
+                        <select class="form-control" id="productSelect">
+                            <option value="">Loading products...</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="predictDemand()">🔮 Predict Demand</button>
+                    <div id="predictionResult" style="margin-top: 20px;"></div>
+                </div>
+
+                <!-- Optimization Recommendations -->
+                <div class="card">
+                    <h3>🎯 Optimization Recommendations</h3>
+                    <div class="form-group">
+                        <label class="form-label">Select Product for Optimization:</label>
+                        <select class="form-control" id="optimizationProductSelect">
+                            <option value="">Loading products...</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-success" onclick="getOptimizationRecommendations()">⚡ Get Recommendations</button>
+                    <div id="optimizationResult" style="margin-top: 20px;"></div>
+                </div>
+
+                <!-- Performance Metrics -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="predictionAccuracy">--</div>
+                        <div class="stat-label">Prediction Accuracy</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="costSavings">--</div>
+                        <div class="stat-label">Cost Savings</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="optimizations">--</div>
+                        <div class="stat-label">Optimizations</div>
+                    </div>
+                </div>
+
+                <!-- Model Performance Chart -->
+                <div class="card">
+                    <h3>📊 Model Performance</h3>
+                    <div class="chart-container">
+                        <canvas id="modelPerformanceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Page -->
+        <div id="settings" class="page">
+            <div class="card">
+                <h2>⚙️ Settings</h2>
+                
+                <div class="settings-section">
+                    <h3>👥 User Management</h3>
+                    <button class="btn btn-primary" onclick="addUser()">+ Add User</button>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>John Doe</td>
+                                <td>john@example.com</td>
+                                <td>Admin</td>
+                                <td><span class="badge badge-success">Active</span></td>
+                                <td>
+                                    <button class="btn btn-primary" onclick="editUser(1)">Edit</button>
+                                    <button class="btn btn-danger" onclick="deleteUser(1)">Delete</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ML API Configuration
+        const ML_API_BASE = 'http://localhost:8000/api/ml';
+
+        // Page Navigation
+        function showPage(pageId) {
+            console.log('Switching to page:', pageId);
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            
+            const targetPage = document.getElementById(pageId);
+            const targetBtn = event.target;
+            
+            if (targetPage) {
+                targetPage.classList.add('active');
+            }
+            if (targetBtn) {
+                targetBtn.classList.add('active');
+            }
+            
+            // Load specific page data
+            if (pageId === 'dashboard') {
+                loadDashboardCharts();
+            } else if (pageId === 'ml') {
+                loadAIInsights();
+            }
+        }
+
+        // Dashboard Charts
+        function loadDashboardCharts() {
+            // Sales Chart
+            const salesCtx = document.getElementById('salesChart').getContext('2d');
+            new Chart(salesCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Sales',
+                        data: [12000, 19000, 15000, 25000, 22000, 30000],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Products Chart
+            const productsCtx = document.getElementById('productsChart').getContext('2d');
+            new Chart(productsCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Electronics', 'Clothing', 'Books', 'Home', 'Sports'],
+                    datasets: [{
+                        data: [300, 200, 150, 100, 50],
+                        backgroundColor: ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        // Product Management Functions
+        function addProduct() {
+            alert('Add Product functionality - This would open a modal to add a new product');
+        }
+
+        function editProduct(id) {
+            alert(`Edit Product ${id} - This would open a modal to edit the product`);
+        }
+
+        function deleteProduct(id) {
+            if (confirm(`Are you sure you want to delete product ${id}?`)) {
+                alert(`Product ${id} deleted successfully`);
+            }
+        }
+
+        function bulkImport() {
+            alert('Bulk Import functionality - This would allow importing products from CSV');
+        }
+
+        // Order Management Functions
+        function createNewOrder() {
+            alert('Create New Order functionality - This would open a modal to create a new order');
+        }
+
+        function viewOrder(orderId) {
+            alert(`View Order ${orderId} - This would show order details`);
+        }
+
+        function editOrder(orderId) {
+            alert(`Edit Order ${orderId} - This would open a modal to edit the order`);
+        }
+
+        function exportOrders() {
+            alert('Export Orders functionality - This would download orders as CSV');
+        }
+
+        // Inventory Management Functions
+        function adjustStock(sku) {
+            alert(`Adjust Stock for ${sku} - This would open a modal to adjust stock levels`);
+        }
+
+        function reorder(sku) {
+            alert(`Reorder ${sku} - This would create a reorder request`);
+        }
+
+        function bulkStockUpdate() {
+            alert('Bulk Stock Update functionality - This would allow bulk stock updates');
+        }
+
+        function generateStockReport() {
+            alert('Generate Stock Report functionality - This would generate and download a stock report');
+        }
+
+        // Reports Functions
+        function showReport(reportType) {
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            alert(`Showing ${reportType} report`);
+        }
+
+        function exportSalesReport() {
+            alert('Export Sales Report functionality - This would download the sales report');
+        }
+
+        // Integration Functions
+        function configureShopify() {
+            alert('Configure Shopify integration');
+        }
+
+        function syncShopify() {
+            alert('Syncing with Shopify...');
+        }
+
+        function connectWooCommerce() {
+            alert('Connect WooCommerce integration');
+        }
+
+        // Settings Functions
+        function addUser() {
+            alert('Add User functionality - This would open a modal to add a new user');
+        }
+
+        function editUser(id) {
+            alert(`Edit User ${id} - This would open a modal to edit the user`);
+        }
+
+        function deleteUser(id) {
+            if (confirm(`Are you sure you want to delete user ${id}?`)) {
+                alert(`User ${id} deleted successfully`);
+            }
+        }
+
+        // ML API Functions
+        async function loadAIInsights() {
+            console.log('Loading AI insights...');
+            loadAIStatus();
+            loadModelPerformance();
+            loadProductOptions();
+        }
+
+        // Load AI model status
+        async function loadAIStatus() {
+            try {
+                const response = await fetch(`${ML_API_BASE}/insights/`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    const insights = data.insights;
+                    document.getElementById('modelsLoaded').textContent = insights.models_status.loaded ? '✅ Yes' : '❌ No';
+                    document.getElementById('forecastingModels').textContent = insights.models_status.forecasting_models;
+                    document.getElementById('productsOptimized').textContent = insights.models_status.optimization_rules;
+                    document.getElementById('modelAccuracy').textContent = `${(insights.performance_metrics.accuracy * 100).toFixed(1)}%`;
+                    
+                    // Update performance metrics
+                    document.getElementById('predictionAccuracy').textContent = `${(insights.performance_metrics.accuracy * 100).toFixed(1)}%`;
+                    document.getElementById('costSavings').textContent = '$12.5K';
+                    document.getElementById('optimizations').textContent = insights.recommendations.total_products_optimized;
+                }
+            } catch (error) {
+                console.error('Error loading AI status:', error);
+                document.getElementById('modelsLoaded').textContent = '❌ Error';
+            }
+        }
+
+        // Load model performance data
+        async function loadModelPerformance() {
+            try {
+                const response = await fetch(`${ML_API_BASE}/performance/`);
+                const data = await response.json();
+                
+                if (data.success && data.performance) {
+                    createModelPerformanceChart(data.performance);
+                }
+            } catch (error) {
+                console.error('Error loading model performance:', error);
+            }
+        }
+
+        // Create model performance chart
+        function createModelPerformanceChart(performanceData) {
+            const ctx = document.getElementById('modelPerformanceChart').getContext('2d');
+            
+            const models = Object.keys(performanceData);
+            const maeValues = models.map(model => performanceData[model].mae);
+            const r2Values = models.map(model => performanceData[model].r2 * 100);
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: models,
+                    datasets: [{
+                        label: 'Mean Absolute Error (MAE)',
+                        data: maeValues,
+                        backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                        borderColor: 'rgba(102, 126, 234, 1)',
+                        borderWidth: 1
+                    }, {
+                        label: 'R² Score (%)',
+                        data: r2Values,
+                        backgroundColor: 'rgba(118, 75, 162, 0.8)',
+                        borderColor: 'rgba(118, 75, 162, 1)',
+                        borderWidth: 1,
+                        yAxisID: 'y1'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'MAE'
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: 'R² Score (%)'
+                            },
+                            grid: {
+                                drawOnChartArea: false,
+                            },
+                        }
+                    }
+                }
+            });
+        }
+
+        // Load product options for dropdowns
+        function loadProductOptions() {
+            // Mock product data - in real implementation, this would come from your products API
+            const products = [
+                { id: 'prod-1', name: 'Smartphone 1', price: 699.99, cost: 400.00 },
+                { id: 'prod-2', name: 'Laptop 2', price: 1299.99, cost: 800.00 },
+                { id: 'prod-3', name: 'Headphones 3', price: 199.99, cost: 80.00 },
+                { id: 'prod-4', name: 'Tablet 4', price: 499.99, cost: 250.00 },
+                { id: 'prod-5', name: 'Smart Watch 5', price: 299.99, cost: 120.00 }
+            ];
+
+            const productSelect = document.getElementById('productSelect');
+            const optimizationSelect = document.getElementById('optimizationProductSelect');
+            
+            // Clear existing options
+            productSelect.innerHTML = '<option value="">Select a product...</option>';
+            optimizationSelect.innerHTML = '<option value="">Select a product...</option>';
+            
+            // Add product options
+            products.forEach(product => {
+                const option1 = new Option(`${product.name} ($${product.price})`, product.id);
+                const option2 = new Option(`${product.name} ($${product.price})`, product.id);
+                productSelect.add(option1);
+                optimizationSelect.add(option2);
+            });
+        }
+
+        // Predict demand for selected product
+        async function predictDemand() {
+            const productSelect = document.getElementById('productSelect');
+            const resultDiv = document.getElementById('predictionResult');
+            
+            if (!productSelect.value) {
+                resultDiv.innerHTML = '<div class="alert alert-warning">Please select a product first.</div>';
+                return;
+            }
+
+            // Mock product data - in real implementation, get from your products API
+            const productData = {
+                product_id: productSelect.value,
+                unit_price: 699.99,
+                cost_price: 400.00,
+                quantity_sold: 15,
+                revenue: 10499.85,
+                days_ahead: 30
+            };
+
+            try {
+                resultDiv.innerHTML = '<div class="alert alert-info">🔮 Predicting demand...</div>';
+                
+                const response = await fetch(`${ML_API_BASE}/predict/demand/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(productData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    const prediction = data.prediction;
+                    resultDiv.innerHTML = `
+                        <div class="alert alert-success">
+                            <h4>🎯 Demand Prediction Results</h4>
+                            <p><strong>Predicted Demand:</strong> ${prediction.predicted_demand} units</p>
+                            <p><strong>Confidence Level:</strong> ${(prediction.confidence * 100).toFixed(1)}%</p>
+                            <p><strong>Model Used:</strong> ${prediction.model_used}</p>
+                            <p><strong>Forecast Period:</strong> ${prediction.days_ahead} days</p>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<div class="alert alert-danger">Error: ${data.error}</div>`;
+                }
+            } catch (error) {
+                console.error('Error predicting demand:', error);
+                resultDiv.innerHTML = '<div class="alert alert-danger">Error connecting to AI service. Please try again.</div>';
+            }
+        }
+
+        // Get optimization recommendations
+        async function getOptimizationRecommendations() {
+            const productSelect = document.getElementById('optimizationProductSelect');
+            const resultDiv = document.getElementById('optimizationResult');
+            
+            if (!productSelect.value) {
+                resultDiv.innerHTML = '<div class="alert alert-warning">Please select a product first.</div>';
+                return;
+            }
+
+            try {
+                resultDiv.innerHTML = '<div class="alert alert-info">⚡ Getting optimization recommendations...</div>';
+                
+                const response = await fetch(`${ML_API_BASE}/optimize/${productSelect.value}/`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    const recommendations = data.recommendations;
+                    resultDiv.innerHTML = `
+                        <div class="alert alert-success">
+                            <h4>🎯 Optimization Recommendations</h4>
+                            <div class="stats-grid">
+                                <div class="stat-card">
+                                    <div class="stat-number">${recommendations.reorder_point}</div>
+                                    <div class="stat-label">Reorder Point</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-number">${recommendations.reorder_quantity}</div>
+                                    <div class="stat-label">Reorder Quantity</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-number">${recommendations.safety_stock}</div>
+                                    <div class="stat-label">Safety Stock</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-number">${(recommendations.service_level * 100).toFixed(1)}%</div>
+                                    <div class="stat-label">Service Level</div>
+                                </div>
+                            </div>
+                            <p><strong>Demand Mean:</strong> ${recommendations.demand_mean} units/day</p>
+                            <p><strong>Demand Std Dev:</strong> ${recommendations.demand_std} units</p>
+                            <p><strong>Cost Price:</strong> $${recommendations.cost_price}</p>
+                            <p><strong>Selling Price:</strong> $${recommendations.selling_price}</p>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<div class="alert alert-danger">Error: ${data.error}</div>`;
+                }
+            } catch (error) {
+                console.error('Error getting optimization recommendations:', error);
+                resultDiv.innerHTML = '<div class="alert alert-danger">Error connecting to AI service. Please try again.</div>';
+            }
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Application initialized');
+            loadDashboardCharts();
+        });
+    </script>
+</body>
+</html>

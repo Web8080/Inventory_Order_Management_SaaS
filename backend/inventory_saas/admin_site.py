@@ -76,3 +76,4 @@ admin_site.register(IntegrationWebhook, IntegrationWebhookAdmin)
 admin_site.register(IntegrationLog, IntegrationLogAdmin)
 admin_site.register(ShopifyStore, ShopifyStoreAdmin)
 admin_site.register(WooCommerceStore, WooCommerceStoreAdmin)
+

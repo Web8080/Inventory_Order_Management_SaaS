@@ -387,3 +387,4 @@ echo "📸 Don't forget to add screenshots to the /screenshots/ folder!"
 echo "📚 Update README.md with actual screenshots once added"
 echo ""
 echo "✨ Ready for GitHub! 🚀"
+

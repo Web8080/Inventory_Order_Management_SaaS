@@ -86,3 +86,4 @@ class WooCommerceStoreSerializer(serializers.ModelSerializer):
             'webhook_products_deleted', 'connected_at', 'last_sync_at'
         ]
         read_only_fields = ['id', 'connected_at', 'last_sync_at']
+

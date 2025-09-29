@@ -49,3 +49,4 @@ This directory contains screenshots of the Inventory Management SaaS application
 - `integration-management.png` - Third-party service management
 - `tenant-administration.png` - Multi-tenant management
 - `user-administration.png` - User and role management
+

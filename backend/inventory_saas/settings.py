@@ -63,6 +63,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "tenants.middleware.TrialAccessMiddleware",  # Trial access control
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "tenants.middleware.TenantMiddleware",
@@ -94,12 +95,8 @@ WSGI_APPLICATION = "inventory_saas.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": config('DB_NAME', default='inventory_saas'),
-        "USER": config('DB_USER', default='inventory_user'),
-        "PASSWORD": config('DB_PASSWORD', default='inventory_pass'),
-        "HOST": config('DB_HOST', default='localhost'),
-        "PORT": config('DB_PORT', default='5432'),
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
     }
 }
 
@@ -148,6 +145,7 @@ STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [
     BASE_DIR / "static",
+    BASE_DIR.parent / "frontend",  # Serve frontend files from Django
 ]
 
 # Default primary key field type
@@ -200,9 +198,12 @@ SIMPLE_JWT = {
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "http://localhost:8000",
+    "http://127.0.0.1:5174",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_ALL_ORIGINS = True  # For development only
 
 # API Documentation
 SPECTACULAR_SETTINGS = {
@@ -270,6 +271,12 @@ TENANT_DOMAIN_MODEL = 'tenants.Domain'
 
 # Custom User Model
 AUTH_USER_MODEL = 'tenants.User'
+
+# Authentication backends
+AUTHENTICATION_BACKENDS = [
+    'tenants.backends.EmailBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
 
 # Logging
 LOGGING = {

@@ -13,3 +13,4 @@ urlpatterns = [
     path('woocommerce/webhook/', views.WooCommerceWebhookView.as_view(), name='woocommerce_webhook'),
     path('import/', views.ImportView.as_view(), name='import_data'),
 ]
+
