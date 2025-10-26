@@ -239,7 +239,7 @@
 <body>
     <div class="onboarding-container">
         <div class="welcome-header">
-            <div class="welcome-icon">🎉</div>
+            <div class="welcome-icon"></div>
             <h1 class="welcome-title">Welcome to InventoryFlow!</h1>
             <p class="welcome-subtitle">Hi <span class="tenant-name">{{ user.first_name }} {{ user.last_name }}</span>!</p>
             <p class="welcome-subtitle">Let's get <span class="tenant-name">{{ tenant.name }}</span> set up for success.</p>
@@ -260,17 +260,17 @@
                 <div class="feature-description">Get demand forecasts and optimization recommendations</div>
             </div>
             <div class="feature-card">
-                <div class="feature-icon">📊</div>
+                <div class="feature-icon"></div>
                 <div class="feature-title">Real-time Analytics</div>
                 <div class="feature-description">Track performance with comprehensive dashboards</div>
             </div>
             <div class="feature-card">
-                <div class="feature-icon">🔗</div>
+                <div class="feature-icon"></div>
                 <div class="feature-title">Easy Integrations</div>
                 <div class="feature-description">Connect with your existing tools and platforms</div>
             </div>
             <div class="feature-card">
-                <div class="feature-icon">⚡</div>
+                <div class="feature-icon"></div>
                 <div class="feature-title">Automation</div>
                 <div class="feature-description">Streamline workflows and reduce manual work</div>
             </div>
@@ -309,7 +309,7 @@
                 const stepElement = document.createElement('div');
                 stepElement.className = `step ${step.completed ? 'completed' : (index === 0 ? 'current' : '')}`;
                 
-                const icon = step.completed ? '✅' : (index === 0 ? '🎯' : '⏳');
+                const icon = step.completed ? '' : (index === 0 ? '' : '');
                 
                 stepElement.innerHTML = `
                     <div class="step-icon">${icon}</div>

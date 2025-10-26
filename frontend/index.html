@@ -377,7 +377,7 @@
         <div class="header">
             <div class="header-content">
                 <div class="header-left">
-                    <h1>🏭 Inventory Management SaaS</h1>
+                    <h1> Inventory Management SaaS</h1>
                     <p>Advanced AI-Powered Inventory & Order Management Platform</p>
                 </div>
                 <div class="header-right">
@@ -391,15 +391,15 @@
 
         <div class="nav">
             <div class="nav-buttons">
-                <button class="nav-btn active" onclick="showPage('dashboard', this)">📊 Dashboard</button>
-                <button class="nav-btn" onclick="showPage('products', this)">📦 Products</button>
-                <button class="nav-btn" onclick="showPage('orders', this)">🛒 Orders</button>
-                <button class="nav-btn" onclick="showPage('inventory', this)">📈 Inventory</button>
-                <button class="nav-btn" onclick="showPage('reports', this)">📋 Reports</button>
-                <button class="nav-btn" onclick="showPage('integrations', this)">🔗 Integrations</button>
+                <button class="nav-btn active" onclick="showPage('dashboard', this)"> Dashboard</button>
+                <button class="nav-btn" onclick="showPage('products', this)"> Products</button>
+                <button class="nav-btn" onclick="showPage('orders', this)"> Orders</button>
+                <button class="nav-btn" onclick="showPage('inventory', this)"> Inventory</button>
+                <button class="nav-btn" onclick="showPage('reports', this)"> Reports</button>
+                <button class="nav-btn" onclick="showPage('integrations', this)"> Integrations</button>
                 <button class="nav-btn" onclick="showPage('ml', this)">🤖 AI Insights</button>
-                <button class="nav-btn" onclick="showPage('settings', this)">⚙️ Settings</button>
-                <button class="nav-btn" onclick="showPage('import', this)">📊 Import Data</button>
+                <button class="nav-btn" onclick="showPage('settings', this)"> Settings</button>
+                <button class="nav-btn" onclick="showPage('import', this)"> Import Data</button>
                 <button class="nav-btn btn-danger" onclick="logout()">🚪 Logout</button>
             </div>
         </div>
@@ -435,7 +435,7 @@
             </div>
 
             <div class="card">
-                <h2>📈 Sales Analytics</h2>
+                <h2> Sales Analytics</h2>
                 <div class="chart-container">
                     <canvas id="salesChart"></canvas>
                 </div>
@@ -445,7 +445,7 @@
                 <h2>🎯 AI-Powered Insights</h2>
                 <div class="ml-insights" id="aiInsightsContent">
                     <div class="insight-item">
-                        <strong>📊 Status:</strong> No data available yet. Import your business data to enable AI insights.
+                        <strong> Status:</strong> No data available yet. Import your business data to enable AI insights.
                     </div>
                     <div class="insight-item">
                         <strong>🚀 Next Steps:</strong> Use the "Import Data" button to upload your products, inventory, and sales data.
@@ -457,7 +457,7 @@
             </div>
 
             <div class="card">
-                <h2>📊 Top Performing Products</h2>
+                <h2> Top Performing Products</h2>
                 <div class="chart-container">
                     <canvas id="productsChart"></canvas>
                 </div>
@@ -467,7 +467,7 @@
         <!-- Products Page -->
         <div id="products" class="page">
             <div class="card">
-                <h2>📦 Product Management</h2>
+                <h2> Product Management</h2>
                 <button class="btn btn-primary" onclick="openModal('addProductModal')">+ Add New Product</button>
                 <button class="btn btn-success" onclick="bulkImport()">📥 Bulk Import</button>
                 
@@ -493,7 +493,7 @@
         <!-- Orders Page -->
         <div id="orders" class="page">
             <div class="card">
-                <h2>🛒 Order Management</h2>
+                <h2> Order Management</h2>
                 <button class="btn btn-primary" onclick="createNewOrder()">+ Create New Order</button>
                 <button class="btn btn-success" onclick="exportOrders()">📥 Export Orders</button>
                 
@@ -537,10 +537,10 @@
         <!-- Inventory Page -->
         <div id="inventory" class="page">
             <div class="card">
-                <h2>📈 Inventory Management</h2>
-                <button class="btn btn-primary" onclick="openModal('adjustStockModal')">📊 Adjust Stock</button>
+                <h2> Inventory Management</h2>
+                <button class="btn btn-primary" onclick="openModal('adjustStockModal')"> Adjust Stock</button>
                 <button class="btn btn-success" onclick="bulkStockUpdate()">📥 Bulk Update</button>
-                <button class="btn btn-warning" onclick="generateStockReport()">📋 Stock Report</button>
+                <button class="btn btn-warning" onclick="generateStockReport()"> Stock Report</button>
 
                 <div class="stats-grid">
                     <div class="stat-card">
@@ -593,16 +593,16 @@
         <!-- Reports Page -->
         <div id="reports" class="page">
             <div class="card">
-                <h2>📋 Reports & Analytics</h2>
+                <h2> Reports & Analytics</h2>
                 <div class="nav-buttons">
-                    <button class="nav-btn active" onclick="showReport('sales', this)">📊 Sales Report</button>
-                    <button class="nav-btn" onclick="showReport('inventory', this)">📦 Inventory Report</button>
-                    <button class="nav-btn" onclick="showReport('performance', this)">📈 Performance Report</button>
+                    <button class="nav-btn active" onclick="showReport('sales', this)"> Sales Report</button>
+                    <button class="nav-btn" onclick="showReport('inventory', this)"> Inventory Report</button>
+                    <button class="nav-btn" onclick="showReport('performance', this)"> Performance Report</button>
                     <button class="nav-btn" onclick="showReport('financial', this)">💰 Financial Report</button>
                 </div>
 
                 <div id="salesReport" class="report-section">
-                    <h3>📊 Sales Analytics</h3>
+                    <h3> Sales Analytics</h3>
                     <div class="chart-container">
                         <canvas id="salesReportChart"></canvas>
                     </div>
@@ -627,7 +627,7 @@
                 </div>
 
                 <div id="inventoryReport" class="report-section" style="display: none;">
-                    <h3>📦 Inventory Analysis</h3>
+                    <h3> Inventory Analysis</h3>
                     <div class="chart-container">
                         <canvas id="inventoryReportChart"></canvas>
                     </div>
@@ -644,7 +644,7 @@
         <!-- Integrations Page -->
         <div id="integrations" class="page">
             <div class="card">
-                <h2>🔗 Third-Party Integrations</h2>
+                <h2> Third-Party Integrations</h2>
                 <p>Connect your inventory system with popular e-commerce platforms and services.</p>
 
                 <div class="stats-grid">
@@ -670,7 +670,7 @@
                     <h3>🛍️ E-commerce Platforms</h3>
                     <div class="integration-item">
                         <div class="integration-header">
-                            <h4>🛒 Shopify</h4>
+                            <h4> Shopify</h4>
                             <span class="badge badge-success">Connected</span>
                         </div>
                         <p>Last sync: 2 minutes ago | Products: 456 | Orders: 23</p>
@@ -689,7 +689,7 @@
 
                     <div class="integration-item">
                         <div class="integration-header">
-                            <h4>📦 Amazon</h4>
+                            <h4> Amazon</h4>
                             <span class="badge badge-success">Connected</span>
                         </div>
                         <p>Last sync: 5 minutes ago | Products: 234 | Orders: 12</p>
@@ -746,7 +746,7 @@
 
                 <!-- Demand Prediction Section -->
                 <div class="card">
-                    <h3>📈 Demand Prediction</h3>
+                    <h3> Demand Prediction</h3>
                     <div class="form-group">
                         <label class="form-label">Select Product for Prediction:</label>
                         <select class="form-control" id="productSelect">
@@ -788,7 +788,7 @@
 
                 <!-- Model Performance Chart -->
                 <div class="card">
-                    <h3>📊 Model Performance</h3>
+                    <h3> Model Performance</h3>
                     <div class="chart-container">
                         <canvas id="modelPerformanceChart"></canvas>
                     </div>
@@ -813,7 +813,7 @@
         <!-- Settings Page -->
         <div id="settings" class="page">
             <div class="card">
-                <h2>⚙️ System Settings</h2>
+                <h2> System Settings</h2>
                 
                 <div class="settings-section">
                     <h3>👤 User Profile</h3>
@@ -899,7 +899,7 @@
                 </div>
 
                 <div class="settings-section">
-                    <h3>📊 Inventory Settings</h3>
+                    <h3> Inventory Settings</h3>
                     <form id="inventorySettings">
                         <div class="form-group">
                             <label class="form-label">Default Reorder Point</label>
@@ -1032,7 +1032,7 @@
         <!-- Import Data Page -->
         <div id="import" class="page">
             <div class="card">
-                <h2>📊 Import Your Data</h2>
+                <h2> Import Your Data</h2>
                 <p class="text-muted">Upload your existing business data to get started with InventoryFlow</p>
                 
                 <div class="import-section">
@@ -1044,10 +1044,10 @@
                                 <h4>Download Templates</h4>
                                 <p>Get CSV templates for your data</p>
                                 <div class="template-buttons">
-                                    <button class="btn btn-outline" onclick="downloadTemplate('products')">📦 Products Template</button>
-                                    <button class="btn btn-outline" onclick="downloadTemplate('inventory')">📈 Inventory Template</button>
+                                    <button class="btn btn-outline" onclick="downloadTemplate('products')"> Products Template</button>
+                                    <button class="btn btn-outline" onclick="downloadTemplate('inventory')"> Inventory Template</button>
                                     <button class="btn btn-outline" onclick="downloadTemplate('customers')">👥 Customers Template</button>
-                                    <button class="btn btn-outline" onclick="downloadTemplate('suppliers')">🏭 Suppliers Template</button>
+                                    <button class="btn btn-outline" onclick="downloadTemplate('suppliers')"> Suppliers Template</button>
                                 </div>
                             </div>
                         </div>
@@ -1086,7 +1086,7 @@
                 </div>
 
                 <div class="import-section">
-                    <h3>📋 Upload Progress</h3>
+                    <h3> Upload Progress</h3>
                     <div id="uploadProgress" class="upload-progress" style="display: none;">
                         <div class="progress-bar">
                             <div class="progress-fill" id="progressFill"></div>
@@ -1269,7 +1269,7 @@
                     <h3>💡 What You Can Import</h3>
                     <div class="import-types">
                         <div class="import-type">
-                            <h4>📦 Products</h4>
+                            <h4> Products</h4>
                             <p>Product catalog with variants, pricing, and categories</p>
                             <ul>
                                 <li>Product name, SKU, description</li>
@@ -1280,7 +1280,7 @@
                         </div>
                         
                         <div class="import-type">
-                            <h4>📈 Inventory</h4>
+                            <h4> Inventory</h4>
                             <p>Current stock levels and warehouse information</p>
                             <ul>
                                 <li>Stock quantities by warehouse</li>
@@ -1302,7 +1302,7 @@
                         </div>
                         
                         <div class="import-type">
-                            <h4>🏭 Suppliers</h4>
+                            <h4> Suppliers</h4>
                             <p>Supplier and vendor information</p>
                             <ul>
                                 <li>Supplier names and contact details</li>
@@ -1332,7 +1332,7 @@
     <!-- Footer -->
     <div class="footer">
         <div class="footer-content">
-            <div class="footer-brand">🏭 Inventory Management SaaS</div>
+            <div class="footer-brand"> Inventory Management SaaS</div>
             <div class="footer-divider"></div>
                 <div class="footer-trademark">Built with love by Victor Ibhafidon</div>
             <div class="footer-company">for XTAINLESS TECHNOLOGIES™</div>
@@ -1718,7 +1718,7 @@
                 // No data, show empty state
                 aiInsightsContent.innerHTML = `
                     <div class="insight-item">
-                        <strong>📊 Status:</strong> No data available yet. Import your business data to enable AI insights.
+                        <strong> Status:</strong> No data available yet. Import your business data to enable AI insights.
                     </div>
                     <div class="insight-item">
                         <strong>🚀 Next Steps:</strong> Use the "Import Data" button to upload your products, inventory, and sales data.
@@ -2519,7 +2519,7 @@
             modal.innerHTML = `
                 <div class="modal-content" style="max-width: 800px;">
                     <span class="close" onclick="closeModal('shopifyConfigModal')">&times;</span>
-                    <h2>🛒 Shopify Integration Setup</h2>
+                    <h2> Shopify Integration Setup</h2>
                     <div class="card">
                         <h3>Step 1: Get Your Shopify Credentials</h3>
                         <p>To connect your Shopify store, you'll need:</p>
@@ -2683,7 +2683,7 @@
             modal.innerHTML = `
                 <div class="modal-content" style="max-width: 800px;">
                     <span class="close" onclick="closeModal('amazonConfigModal')">&times;</span>
-                    <h2>📦 Amazon Integration Setup</h2>
+                    <h2> Amazon Integration Setup</h2>
                     <div class="card">
                         <h3>Step 1: Amazon Seller Central Setup</h3>
                         <p>To connect your Amazon seller account, you'll need:</p>
@@ -3403,7 +3403,7 @@
             // Update AI status
             document.getElementById('aiStatus').innerHTML = `
                 <div class="ai-status-item">
-                    <span class="status-icon">📊</span>
+                    <span class="status-icon"></span>
                     <span class="status-text">No data available</span>
                 </div>
                 <div class="ai-status-item">
@@ -3434,7 +3434,7 @@
             // Update prediction section
             document.getElementById('predictionResults').innerHTML = `
                 <div class="empty-state">
-                    <div class="empty-icon">📈</div>
+                    <div class="empty-icon"></div>
                     <h4>No Predictions Available</h4>
                     <p>Import your product and sales data to get AI-powered demand predictions.</p>
                     <button class="btn btn-primary" onclick="showPage('import')">Import Data</button>

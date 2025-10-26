@@ -1,0 +1,6 @@
+product_sku,warehouse,quantity
+PROD001,Main Warehouse,100
+PROD002,Main Warehouse,50
+PROD003,Main Warehouse,25
+PROD004,Secondary Warehouse,200
+PROD005,Main Warehouse,75

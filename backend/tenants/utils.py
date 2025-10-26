@@ -288,6 +288,15 @@ def generate_sample_csvs():
                 ['Global Parts Ltd', 'Bob Williams', 'bob@globalparts.com', '444-555-6666', '101 Industrial Rd, Parts Town, PT 67890'],
                 ['Quality Goods Co', 'Carol Davis', 'carol@qualitygoods.com', '777-888-9999', '555 Commerce St, Business City, BC 54321']
             ]
+        },
+        'orders': {
+            'filename': 'orders_template.csv',
+            'headers': ['order_number', 'customer_name', 'customer_email', 'customer_phone', 'product_sku', 'quantity', 'unit_price', 'total_price', 'order_date', 'status'],
+            'sample_data': [
+                ['ORD001', 'John Doe', 'john.doe@example.com', '555-1234', 'PROD001', '2', '19.99', '39.98', '2024-01-15', 'pending'],
+                ['ORD002', 'Jane Smith', 'jane.smith@example.com', '555-5678', 'PROD002', '1', '29.99', '29.99', '2024-01-16', 'processing'],
+                ['ORD003', 'Bob Johnson', 'bob.johnson@example.com', '555-9012', 'PROD003', '3', '49.99', '149.97', '2024-01-17', 'completed']
+            ]
         }
     }
     

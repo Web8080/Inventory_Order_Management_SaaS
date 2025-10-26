@@ -1,0 +1,6 @@
+first_name,last_name,email,phone,address,city,state,zip_code,country,company,notes
+John,Doe,john.doe@example.com,555-1234,123 Main St,Anytown,NY,10001,USA,Acme Corp,VIP customer with high volume orders
+Jane,Smith,jane.smith@example.com,555-5678,456 Oak Ave,Otherville,CA,90210,USA,Tech Solutions Inc,Regular customer prefers express shipping
+Bob,Johnson,bob.johnson@example.com,555-9012,789 Pine Rd,Somewhere,TX,75001,USA,Global Industries,New customer first order
+Alice,Brown,alice.brown@example.com,555-2468,321 Elm St,Nowhere,FL,33101,USA,Creative Designs,Bulk order customer
+Charlie,Wilson,charlie.wilson@example.com,555-1357,654 Maple Dr,Everywhere,WA,98101,USA,Innovation Labs,Premium customer fast payment

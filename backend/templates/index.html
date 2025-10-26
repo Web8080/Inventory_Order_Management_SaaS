@@ -377,7 +377,7 @@
         <div class="header">
             <div class="header-content">
                 <div class="header-left">
-                    <h1>🏭 Inventory Management SaaS</h1>
+                    <h1>Inventory Management SaaS</h1>
                     <p>Advanced AI-Powered Inventory & Order Management Platform</p>
                 </div>
                 <div class="header-right">
@@ -391,16 +391,18 @@
 
         <div class="nav">
             <div class="nav-buttons">
-                <button class="nav-btn active" onclick="showPage('dashboard', this)">📊 Dashboard</button>
-                <button class="nav-btn" onclick="showPage('products', this)">📦 Products</button>
-                <button class="nav-btn" onclick="showPage('orders', this)">🛒 Orders</button>
-                <button class="nav-btn" onclick="showPage('inventory', this)">📈 Inventory</button>
-                <button class="nav-btn" onclick="showPage('reports', this)">📋 Reports</button>
-                <button class="nav-btn" onclick="showPage('integrations', this)">🔗 Integrations</button>
-                <button class="nav-btn" onclick="showPage('ml', this)">🤖 AI Insights</button>
-                <button class="nav-btn" onclick="showPage('settings', this)">⚙️ Settings</button>
-                <button class="nav-btn" onclick="showPage('import', this)">📊 Import Data</button>
-                <button class="nav-btn btn-danger" onclick="logout()">🚪 Logout</button>
+                <button class="nav-btn active" onclick="showPage('dashboard', this)">Dashboard</button>
+                <button class="nav-btn" onclick="showPage('products', this)">Products</button>
+                <button class="nav-btn" onclick="showPage('customers', this)">Customers</button>
+                <button class="nav-btn" onclick="showPage('suppliers', this)">Suppliers</button>
+                <button class="nav-btn" onclick="showPage('orders', this)">Orders</button>
+                <button class="nav-btn" onclick="showPage('inventory', this)">Inventory</button>
+                <button class="nav-btn" onclick="showPage('reports', this)">Reports</button>
+                <button class="nav-btn" onclick="showPage('integrations', this)">Integrations</button>
+                <button class="nav-btn" onclick="showPage('ml', this)">AI Insights</button>
+                <button class="nav-btn" onclick="showPage('settings', this)">Settings</button>
+                <button class="nav-btn" onclick="showPage('import', this)">Import Data</button>
+                <button class="nav-btn btn-danger" onclick="logout()">Logout</button>
             </div>
         </div>
 
@@ -409,7 +411,7 @@
             <!-- Trial Status Banner -->
             <div id="trial-banner" class="trial-banner" style="display: none;">
                 <div class="trial-content">
-                    <span class="trial-icon">🎉</span>
+                    <span class="trial-icon">Trial</span>
                     <span class="trial-text">Free Trial Active - <span id="trial-days">14</span> days remaining</span>
                     <button class="trial-upgrade-btn" onclick="upgradeTrial()">Upgrade Now</button>
                 </div>
@@ -435,29 +437,29 @@
             </div>
 
             <div class="card">
-                <h2>📈 Sales Analytics</h2>
+                <h2>Sales Analytics</h2>
                 <div class="chart-container">
                     <canvas id="salesChart"></canvas>
                 </div>
             </div>
 
             <div class="card">
-                <h2>🎯 AI-Powered Insights</h2>
+                <h2>AI-Powered Insights</h2>
                 <div class="ml-insights" id="aiInsightsContent">
                     <div class="insight-item">
-                        <strong>📊 Status:</strong> No data available yet. Import your business data to enable AI insights.
+                        <strong>Status:</strong> No data available yet. Import your business data to enable AI insights.
                     </div>
                     <div class="insight-item">
-                        <strong>🚀 Next Steps:</strong> Use the "Import Data" button to upload your products, inventory, and sales data.
+                        <strong>Next Steps:</strong> Use the "Import Data" button to upload your products, inventory, and sales data.
                     </div>
                     <div class="insight-item">
-                        <strong>💡 Benefits:</strong> Once you have data, you'll see demand forecasts, stock alerts, and revenue predictions.
+                        <strong>Benefits:</strong> Once you have data, you'll see demand forecasts, stock alerts, and revenue predictions.
                     </div>
                 </div>
             </div>
 
             <div class="card">
-                <h2>📊 Top Performing Products</h2>
+                <h2>Top Performing Products</h2>
                 <div class="chart-container">
                     <canvas id="productsChart"></canvas>
                 </div>
@@ -467,9 +469,9 @@
         <!-- Products Page -->
         <div id="products" class="page">
             <div class="card">
-                <h2>📦 Product Management</h2>
+                <h2>Product Management</h2>
                 <button class="btn btn-primary" onclick="openModal('addProductModal')">+ Add New Product</button>
-                <button class="btn btn-success" onclick="bulkImport()">📥 Bulk Import</button>
+                <button class="btn btn-success" onclick="bulkImport()"> Bulk Import</button>
                 
                 <table class="table">
                     <thead>
@@ -490,12 +492,72 @@
             </div>
         </div>
 
+        <!-- Customers Page -->
+        <div id="customers" class="page">
+            <div class="card">
+                <h2> Customer Management</h2>
+                <button class="btn btn-primary" onclick="openModal('addCustomerModal')">+ Add New Customer</button>
+                <button class="btn btn-success" onclick="bulkImport()"> Bulk Import</button>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Company</th>
+                                <th>Location</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customersTableBody">
+                            <tr>
+                                <td colspan="7" class="text-center text-muted">Loading customers...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Suppliers Page -->
+        <div id="suppliers" class="page">
+            <div class="card">
+                <h2> Supplier Management</h2>
+                <button class="btn btn-primary" onclick="openModal('addSupplierModal')">+ Add New Supplier</button>
+                <button class="btn btn-success" onclick="bulkImport()"> Bulk Import</button>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Contact Person</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Website</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="suppliersTableBody">
+                            <tr>
+                                <td colspan="7" class="text-center text-muted">Loading suppliers...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
         <!-- Orders Page -->
         <div id="orders" class="page">
             <div class="card">
-                <h2>🛒 Order Management</h2>
+                <h2> Order Management</h2>
                 <button class="btn btn-primary" onclick="createNewOrder()">+ Create New Order</button>
-                <button class="btn btn-success" onclick="exportOrders()">📥 Export Orders</button>
+                <button class="btn btn-success" onclick="exportOrders()"> Export Orders</button>
                 
                 <div class="stats-grid">
                     <div class="stat-card">
@@ -537,10 +599,10 @@
         <!-- Inventory Page -->
         <div id="inventory" class="page">
             <div class="card">
-                <h2>📈 Inventory Management</h2>
-                <button class="btn btn-primary" onclick="openModal('adjustStockModal')">📊 Adjust Stock</button>
-                <button class="btn btn-success" onclick="bulkStockUpdate()">📥 Bulk Update</button>
-                <button class="btn btn-warning" onclick="generateStockReport()">📋 Stock Report</button>
+                <h2> Inventory Management</h2>
+                <button class="btn btn-primary" onclick="openModal('adjustStockModal')"> Adjust Stock</button>
+                <button class="btn btn-success" onclick="bulkStockUpdate()"> Bulk Update</button>
+                <button class="btn btn-warning" onclick="generateStockReport()"> Stock Report</button>
 
                 <div class="stats-grid">
                     <div class="stat-card">
@@ -593,16 +655,16 @@
         <!-- Reports Page -->
         <div id="reports" class="page">
             <div class="card">
-                <h2>📋 Reports & Analytics</h2>
+                <h2> Reports & Analytics</h2>
                 <div class="nav-buttons">
-                    <button class="nav-btn active" onclick="showReport('sales', this)">📊 Sales Report</button>
-                    <button class="nav-btn" onclick="showReport('inventory', this)">📦 Inventory Report</button>
-                    <button class="nav-btn" onclick="showReport('performance', this)">📈 Performance Report</button>
-                    <button class="nav-btn" onclick="showReport('financial', this)">💰 Financial Report</button>
+                    <button class="nav-btn active" onclick="showReport('sales', this)"> Sales Report</button>
+                    <button class="nav-btn" onclick="showReport('inventory', this)"> Inventory Report</button>
+                    <button class="nav-btn" onclick="showReport('performance', this)"> Performance Report</button>
+                    <button class="nav-btn" onclick="showReport('financial', this)"> Financial Report</button>
                 </div>
 
                 <div id="salesReport" class="report-section">
-                    <h3>📊 Sales Analytics</h3>
+                    <h3> Sales Analytics</h3>
                     <div class="chart-container">
                         <canvas id="salesReportChart"></canvas>
                     </div>
@@ -627,7 +689,7 @@
                 </div>
 
                 <div id="inventoryReport" class="report-section" style="display: none;">
-                    <h3>📦 Inventory Analysis</h3>
+                    <h3> Inventory Analysis</h3>
                     <div class="chart-container">
                         <canvas id="inventoryReportChart"></canvas>
                     </div>
@@ -644,7 +706,7 @@
         <!-- Integrations Page -->
         <div id="integrations" class="page">
             <div class="card">
-                <h2>🔗 Third-Party Integrations</h2>
+                <h2> Third-Party Integrations</h2>
                 <p>Connect your inventory system with popular e-commerce platforms and services.</p>
 
                 <div class="stats-grid">
@@ -667,10 +729,10 @@
                 </div>
 
                 <div class="card">
-                    <h3>🛍️ E-commerce Platforms</h3>
+                    <h3> E-commerce Platforms</h3>
                     <div class="integration-item">
                         <div class="integration-header">
-                            <h4>🛒 Shopify</h4>
+                            <h4> Shopify</h4>
                             <span class="badge badge-success">Connected</span>
                         </div>
                         <p>Last sync: 2 minutes ago | Products: 456 | Orders: 23</p>
@@ -680,7 +742,7 @@
 
                     <div class="integration-item">
                         <div class="integration-header">
-                            <h4>🛍️ WooCommerce</h4>
+                            <h4> WooCommerce</h4>
                             <span class="badge badge-warning">Pending Setup</span>
                         </div>
                         <p>Connect your WooCommerce store to sync products and orders</p>
@@ -689,7 +751,7 @@
 
                     <div class="integration-item">
                         <div class="integration-header">
-                            <h4>📦 Amazon</h4>
+                            <h4> Amazon</h4>
                             <span class="badge badge-success">Connected</span>
                         </div>
                         <p>Last sync: 5 minutes ago | Products: 234 | Orders: 12</p>
@@ -702,7 +764,7 @@
                     <h3>💼 Business Tools</h3>
                     <div class="integration-item">
                         <div class="integration-header">
-                            <h4>💰 QuickBooks</h4>
+                            <h4> QuickBooks</h4>
                             <span class="badge badge-warning">Pending Setup</span>
                         </div>
                         <p>Sync financial data and generate invoices automatically</p>
@@ -724,7 +786,7 @@
         <!-- AI Insights Page -->
         <div id="ml" class="page">
             <div class="card">
-                <h2>🤖 AI-Powered Insights</h2>
+                <h2> AI-Powered Insights</h2>
                 <p>Leverage machine learning to optimize your inventory and predict future trends.</p>
 
                 <!-- AI Model Status -->
@@ -746,7 +808,7 @@
 
                 <!-- Demand Prediction Section -->
                 <div class="card">
-                    <h3>📈 Demand Prediction</h3>
+                    <h3> Demand Prediction</h3>
                     <div class="form-group">
                         <label class="form-label">Select Product for Prediction:</label>
                         <select class="form-control" id="productSelect">
@@ -759,14 +821,14 @@
 
                 <!-- Optimization Recommendations -->
                 <div class="card">
-                    <h3>🎯 Optimization Recommendations</h3>
+                    <h3> Optimization Recommendations</h3>
                     <div class="form-group">
                         <label class="form-label">Select Product for Optimization:</label>
                         <select class="form-control" id="optimizationProductSelect">
                             <option value="">Loading products...</option>
                         </select>
                     </div>
-                    <button class="btn btn-success" onclick="getOptimizationRecommendations()">⚡ Get Recommendations</button>
+                    <button class="btn btn-success" onclick="getOptimizationRecommendations()"> Get Recommendations</button>
                     <div id="optimizationResult" style="margin-top: 20px;"></div>
                 </div>
 
@@ -788,7 +850,7 @@
 
                 <!-- Model Performance Chart -->
                 <div class="card">
-                    <h3>📊 Model Performance</h3>
+                    <h3> Model Performance</h3>
                     <div class="chart-container">
                         <canvas id="modelPerformanceChart"></canvas>
                     </div>
@@ -796,15 +858,15 @@
 
                 <!-- AI Recommendations -->
                 <div class="card">
-                    <h3>🎯 AI Recommendations</h3>
+                    <h3> AI Recommendations</h3>
                     <div class="alert alert-success">
-                        <strong>✅ High Priority:</strong> Increase iPhone 15 Pro stock by 30% for February
+                        <strong> High Priority:</strong> Increase iPhone 15 Pro stock by 30% for February
                     </div>
                     <div class="alert alert-warning">
-                        <strong>⚠️ Medium Priority:</strong> Reduce MacBook Pro M3 inventory by 20% for Q2
+                        <strong> Medium Priority:</strong> Reduce MacBook Pro M3 inventory by 20% for Q2
                     </div>
                     <div class="alert alert-info">
-                        <strong>ℹ️ Low Priority:</strong> Consider adding wireless accessories category
+                        <strong> Low Priority:</strong> Consider adding wireless accessories category
                     </div>
                 </div>
             </div>
@@ -813,7 +875,7 @@
         <!-- Settings Page -->
         <div id="settings" class="page">
             <div class="card">
-                <h2>⚙️ System Settings</h2>
+                <h2> System Settings</h2>
                 
                 <div class="settings-section">
                     <h3>👤 User Profile</h3>
@@ -839,7 +901,7 @@
                 </div>
                 
                 <div class="settings-section">
-                    <h3>🔐 Security Settings</h3>
+                    <h3> Security Settings</h3>
                     <form id="passwordChangeForm">
                         <div class="form-group">
                             <label class="form-label">Current Password</label>
@@ -859,7 +921,7 @@
                 </div>
 
                 <div class="settings-section">
-                    <h3>🏢 Company Information</h3>
+                    <h3> Company Information</h3>
                     <form id="companySettings">
                         <div class="form-group">
                             <label class="form-label">Company Name</label>
@@ -899,7 +961,7 @@
                 </div>
 
                 <div class="settings-section">
-                    <h3>📊 Inventory Settings</h3>
+                    <h3> Inventory Settings</h3>
                     <form id="inventorySettings">
                         <div class="form-group">
                             <label class="form-label">Default Reorder Point</label>
@@ -949,7 +1011,7 @@
                 </div>
 
                 <div class="settings-section">
-                    <h3>👥 User Management</h3>
+                    <h3> User Management</h3>
                     <button class="btn btn-primary" onclick="addUser()">+ Add User</button>
                     <table class="table">
                         <thead>
@@ -1028,15 +1090,114 @@
             </div>
         </div>
 
+        <!-- Add Customer Modal -->
+        <div id="addCustomerModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal('addCustomerModal')">&times;</span>
+                <h2>Add New Customer</h2>
+                <form id="addCustomerForm">
+                    <div class="form-group">
+                        <label class="form-label">First Name *</label>
+                        <input type="text" class="form-control" name="first_name" placeholder="e.g., John" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Last Name *</label>
+                        <input type="text" class="form-control" name="last_name" placeholder="e.g., Doe" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email *</label>
+                        <input type="email" class="form-control" name="email" placeholder="e.g., john.doe@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Phone</label>
+                        <input type="tel" class="form-control" name="phone" placeholder="e.g., +1 (555) 123-4567">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Company</label>
+                        <input type="text" class="form-control" name="company" placeholder="e.g., Acme Corp">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Address</label>
+                        <textarea class="form-control" name="address" rows="3" placeholder="Enter full address..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">City</label>
+                        <input type="text" class="form-control" name="city" placeholder="e.g., New York">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">State</label>
+                        <input type="text" class="form-control" name="state" placeholder="e.g., NY">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Zip Code</label>
+                        <input type="text" class="form-control" name="zip_code" placeholder="e.g., 10001">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Country</label>
+                        <input type="text" class="form-control" name="country" placeholder="e.g., USA">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Notes</label>
+                        <textarea class="form-control" name="notes" rows="3" placeholder="Additional notes about the customer..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Customer</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addCustomerModal')">Cancel</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Add Supplier Modal -->
+        <div id="addSupplierModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal('addSupplierModal')">&times;</span>
+                <h2>Add New Supplier</h2>
+                <form id="addSupplierForm">
+                    <div class="form-group">
+                        <label class="form-label">Company Name *</label>
+                        <input type="text" class="form-control" name="name" placeholder="e.g., Tech Distributors Inc" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Contact Person</label>
+                        <input type="text" class="form-control" name="contact_person" placeholder="e.g., Jane Smith">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" name="email" placeholder="e.g., contact@techdist.com">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Phone</label>
+                        <input type="tel" class="form-control" name="phone" placeholder="e.g., +1 (555) 987-6543">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Website</label>
+                        <input type="url" class="form-control" name="website" placeholder="e.g., https://www.techdist.com">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Address</label>
+                        <textarea class="form-control" name="address" rows="3" placeholder="Enter supplier address..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Payment Terms</label>
+                        <input type="text" class="form-control" name="payment_terms" placeholder="e.g., Net 30, COD">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Notes</label>
+                        <textarea class="form-control" name="notes" rows="3" placeholder="Additional notes about the supplier..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Supplier</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addSupplierModal')">Cancel</button>
+                </form>
+            </div>
+        </div>
 
         <!-- Import Data Page -->
         <div id="import" class="page">
             <div class="card">
-                <h2>📊 Import Your Data</h2>
+                <h2> Import Your Data</h2>
                 <p class="text-muted">Upload your existing business data to get started with InventoryFlow</p>
                 
                 <div class="import-section">
-                    <h3>🚀 Quick Start Guide</h3>
+                    <h3> Quick Start Guide</h3>
                     <div class="import-steps">
                         <div class="step">
                             <div class="step-number">1</div>
@@ -1044,10 +1205,11 @@
                                 <h4>Download Templates</h4>
                                 <p>Get CSV templates for your data</p>
                                 <div class="template-buttons">
-                                    <button class="btn btn-outline" onclick="downloadTemplate('products')">📦 Products Template</button>
-                                    <button class="btn btn-outline" onclick="downloadTemplate('inventory')">📈 Inventory Template</button>
-                                    <button class="btn btn-outline" onclick="downloadTemplate('customers')">👥 Customers Template</button>
-                                    <button class="btn btn-outline" onclick="downloadTemplate('suppliers')">🏭 Suppliers Template</button>
+                                    <button class="btn btn-outline" onclick="downloadTemplate('products')"> Products Template</button>
+                                    <button class="btn btn-outline" onclick="downloadTemplate('inventory')"> Inventory Template</button>
+                                    <button class="btn btn-outline" onclick="downloadTemplate('orders')"> Orders Template</button>
+                                    <button class="btn btn-outline" onclick="downloadTemplate('customers')"> Customers Template</button>
+                                    <button class="btn btn-outline" onclick="downloadTemplate('suppliers')"> Suppliers Template</button>
                                 </div>
                             </div>
                         </div>
@@ -1058,10 +1220,10 @@
                                 <h4>Prepare Your Data</h4>
                                 <p>Fill in your data using the templates</p>
                                 <ul>
-                                    <li>✅ Use the exact column headers from templates</li>
-                                    <li>✅ Ensure data is in the correct format</li>
-                                    <li>✅ Remove any empty rows</li>
-                                    <li>✅ Save as CSV format</li>
+                                    <li> Use the exact column headers from templates</li>
+                                    <li> Ensure data is in the correct format</li>
+                                    <li> Remove any empty rows</li>
+                                    <li> Save as CSV format</li>
                                 </ul>
                             </div>
                         </div>
@@ -1071,6 +1233,20 @@
                             <div class="step-content">
                                 <h4>Upload Your Files</h4>
                                 <p>Upload your prepared CSV files</p>
+                                
+                                <div class="form-group" style="margin-bottom: 20px;">
+                                    <label class="form-label">Select Template Type *</label>
+                                    <select id="templateType" class="form-control" required style="font-size: 16px; padding: 12px; border: 2px solid #e1e5e9; border-radius: 8px; background: white;">
+                                        <option value="">Choose template type...</option>
+                                        <option value="products"> Products Template</option>
+                                        <option value="inventory"> Inventory Template</option>
+                                        <option value="orders"> Orders Template</option>
+                                        <option value="customers"> Customers Template</option>
+                                        <option value="suppliers"> Suppliers Template</option>
+                                    </select>
+                                    <small class="form-text text-muted">Select the type of data you're uploading to ensure proper processing.</small>
+                                </div>
+                                
                                 <div class="upload-area" id="uploadArea">
                                     <div class="upload-content">
                                         <div class="upload-icon">📁</div>
@@ -1086,7 +1262,7 @@
                 </div>
 
                 <div class="import-section">
-                    <h3>📋 Upload Progress</h3>
+                    <h3> Upload Progress</h3>
                     <div id="uploadProgress" class="upload-progress" style="display: none;">
                         <div class="progress-bar">
                             <div class="progress-fill" id="progressFill"></div>
@@ -1101,7 +1277,7 @@
                 </div>
 
                 <div class="import-section">
-                    <h3>📝 Manual Data Entry</h3>
+                    <h3> Manual Data Entry</h3>
                     <p>Prefer to enter data manually? Use our quick entry forms:</p>
                     <div class="manual-entry-buttons">
                         <button class="btn btn-outline" onclick="showManualEntry('products')">Add Products</button>
@@ -1266,10 +1442,10 @@
                 </div>
 
                 <div class="import-section">
-                    <h3>💡 What You Can Import</h3>
+                    <h3> What You Can Import</h3>
                     <div class="import-types">
                         <div class="import-type">
-                            <h4>📦 Products</h4>
+                            <h4> Products</h4>
                             <p>Product catalog with variants, pricing, and categories</p>
                             <ul>
                                 <li>Product name, SKU, description</li>
@@ -1280,7 +1456,7 @@
                         </div>
                         
                         <div class="import-type">
-                            <h4>📈 Inventory</h4>
+                            <h4> Inventory</h4>
                             <p>Current stock levels and warehouse information</p>
                             <ul>
                                 <li>Stock quantities by warehouse</li>
@@ -1291,7 +1467,7 @@
                         </div>
                         
                         <div class="import-type">
-                            <h4>👥 Customers</h4>
+                            <h4> Customers</h4>
                             <p>Customer database and contact information</p>
                             <ul>
                                 <li>Customer names and contact details</li>
@@ -1302,7 +1478,7 @@
                         </div>
                         
                         <div class="import-type">
-                            <h4>🏭 Suppliers</h4>
+                            <h4> Suppliers</h4>
                             <p>Supplier and vendor information</p>
                             <ul>
                                 <li>Supplier names and contact details</li>
@@ -1319,8 +1495,8 @@
                     <div class="help-content">
                         <p>Having trouble with your import? We're here to help!</p>
                         <div class="help-options">
-                            <button class="btn btn-outline" onclick="showHelp('format')">📝 Data Format Help</button>
-                            <button class="btn btn-outline" onclick="showHelp('troubleshooting')">🔧 Troubleshooting</button>
+                            <button class="btn btn-outline" onclick="showHelp('format')"> Data Format Help</button>
+                            <button class="btn btn-outline" onclick="showHelp('troubleshooting')"> Troubleshooting</button>
                             <button class="btn btn-outline" onclick="showHelp('contact')">📞 Contact Support</button>
                         </div>
                     </div>
@@ -1332,7 +1508,7 @@
     <!-- Footer -->
     <div class="footer">
         <div class="footer-content">
-            <div class="footer-brand">🏭 Inventory Management SaaS</div>
+            <div class="footer-brand"> Inventory Management SaaS</div>
             <div class="footer-divider"></div>
                 <div class="footer-trademark">Built with love by Victor Ibhafidon</div>
             <div class="footer-company">for XTAINLESS TECHNOLOGIES™</div>
@@ -1515,6 +1691,10 @@
                 loadTrialStatus();
             } else if (pageId === 'products') {
                 loadProductsTable();
+            } else if (pageId === 'customers') {
+                loadCustomersTable();
+            } else if (pageId === 'suppliers') {
+                loadSuppliersTable();
             } else if (pageId === 'orders') {
                 loadOrdersTable();
             } else if (pageId === 'inventory') {
@@ -1623,14 +1803,24 @@
         
         function showEmptyDashboard() {
             // Update metrics to show 0 for new users
-            document.getElementById('totalProducts').textContent = '0';
-            document.getElementById('totalOrders').textContent = '0';
-            document.getElementById('totalRevenue').textContent = '$0';
-            document.getElementById('inventoryValue').textContent = '$0';
+            const totalProductsEl = document.getElementById('totalProducts');
+            const totalOrdersEl = document.getElementById('totalOrders');
+            const totalRevenueEl = document.getElementById('totalRevenue');
+            const inventoryValueEl = document.getElementById('inventoryValue');
+            
+            if (totalProductsEl) totalProductsEl.textContent = '0';
+            if (totalOrdersEl) totalOrdersEl.textContent = '0';
+            if (totalRevenueEl) totalRevenueEl.textContent = '$0';
+            if (inventoryValueEl) inventoryValueEl.textContent = '$0';
             
             // Show empty sales chart
             destroyChart('salesChart');
-            const salesCtx = document.getElementById('salesChart').getContext('2d');
+            const salesChartEl = document.getElementById('salesChart');
+            if (!salesChartEl) {
+                console.warn('Sales chart element not found');
+                return;
+            }
+            const salesCtx = salesChartEl.getContext('2d');
             chartInstances['salesChart'] = new Chart(salesCtx, {
                 type: 'line',
                 data: {
@@ -1696,6 +1886,10 @@
         
         function updateLowStockItems(items) {
             const tbody = document.querySelector('#lowStockTable tbody');
+            if (!tbody) {
+                console.warn('Low stock table not found');
+                return;
+            }
             if (items.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">No low stock items. Import your inventory data to see stock levels.</td></tr>';
             } else {
@@ -1711,6 +1905,10 @@
         
         function updateTopProducts(products) {
             const tbody = document.querySelector('#topProductsTable tbody');
+            if (!tbody) {
+                console.warn('Top products table not found');
+                return;
+            }
             if (products.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">No sales data yet. Import your orders to see top products.</td></tr>';
             } else {
@@ -1726,6 +1924,10 @@
         
         function updateAIInsights(data) {
             const aiInsightsContent = document.getElementById('aiInsightsContent');
+            if (!aiInsightsContent) {
+                console.warn('AI insights content not found');
+                return;
+            }
             
             if (data.metrics.total_products > 0) {
                 // User has data, show real AI insights
@@ -1734,23 +1936,23 @@
                         <strong>🔮 Demand Forecast:</strong> Based on your ${data.metrics.total_products} products, demand patterns are being analyzed.
                     </div>
                     <div class="insight-item">
-                        <strong>⚠️ Stock Alert:</strong> ${data.low_stock_items.length} items need attention for restocking.
+                        <strong> Stock Alert:</strong> ${data.low_stock_items.length} items need attention for restocking.
                     </div>
                     <div class="insight-item">
-                        <strong>💰 Revenue Prediction:</strong> Current month revenue: $${data.metrics.revenue_30_days.toLocaleString()}.
+                        <strong> Revenue Prediction:</strong> Current month revenue: $${data.metrics.revenue_30_days.toLocaleString()}.
                     </div>
                 `;
             } else {
                 // No data, show empty state
                 aiInsightsContent.innerHTML = `
                     <div class="insight-item">
-                        <strong>📊 Status:</strong> No data available yet. Import your business data to enable AI insights.
+                        <strong> Status:</strong> No data available yet. Import your business data to enable AI insights.
                     </div>
                     <div class="insight-item">
-                        <strong>🚀 Next Steps:</strong> Use the "Import Data" button to upload your products, inventory, and sales data.
+                        <strong> Next Steps:</strong> Use the "Import Data" button to upload your products, inventory, and sales data.
                     </div>
                     <div class="insight-item">
-                        <strong>💡 Benefits:</strong> Once you have data, you'll see demand forecasts, stock alerts, and revenue predictions.
+                        <strong> Benefits:</strong> Once you have data, you'll see demand forecasts, stock alerts, and revenue predictions.
                     </div>
                 `;
             }
@@ -1793,14 +1995,112 @@
             } catch (error) {
                 console.error('Error loading products:', error);
                 const tbody = document.getElementById('productsTable');
+                if (tbody) {
                 tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">Error loading products. Please refresh the page.</td></tr>';
+                }
+            }
+        }
+
+        async function loadCustomersTable() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/products/customers/`, {
+                    credentials: 'include'
+                });
+                const result = await response.json();
+                console.log('Customers API response:', result);
+                const tbody = document.getElementById('customersTableBody');
+                
+                // Handle both paginated and direct array responses
+                const customers = result.results || result;
+                
+                if (customers && customers.length > 0) {
+                    tbody.innerHTML = '';
+                    customers.forEach(customer => {
+                        const row = document.createElement('tr');
+                        const location = [customer.city, customer.state, customer.country].filter(Boolean).join(', ') || 'N/A';
+                        const statusClass = customer.is_active ? 'badge-success' : 'badge-secondary';
+                        const statusText = customer.is_active ? 'Active' : 'Inactive';
+                        
+                        row.innerHTML = `
+                            <td>${customer.full_name || 'N/A'}</td>
+                            <td>${customer.email || 'N/A'}</td>
+                            <td>${customer.phone || 'N/A'}</td>
+                            <td>${customer.company || 'N/A'}</td>
+                            <td>${location}</td>
+                            <td><span class="badge ${statusClass}">${statusText}</span></td>
+                            <td>
+                                <button class="btn btn-primary" onclick="editCustomer('${customer.id}')">Edit</button>
+                                <button class="btn btn-danger" onclick="deleteCustomer('${customer.id}')">Delete</button>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                } else {
+                    // No data - show empty state
+                    tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No customers found. <a href="#" onclick="showPage(\'import\', this)">Import your customers</a> to get started.</td></tr>';
+                }
+            } catch (error) {
+                console.error('Error loading customers:', error);
+                const tbody = document.getElementById('customersTableBody');
+                if (tbody) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">Error loading customers. Please refresh the page.</td></tr>';
+                }
+            }
+        }
+
+        async function loadSuppliersTable() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/products/suppliers/`, {
+                    credentials: 'include'
+                });
+                const result = await response.json();
+                console.log('Suppliers API response:', result);
+                const tbody = document.getElementById('suppliersTableBody');
+                
+                // Handle both paginated and direct array responses
+                const suppliers = result.results || result;
+                
+                if (suppliers && suppliers.length > 0) {
+                    tbody.innerHTML = '';
+                    suppliers.forEach(supplier => {
+                        const row = document.createElement('tr');
+                        const statusClass = supplier.is_active ? 'badge-success' : 'badge-secondary';
+                        const statusText = supplier.is_active ? 'Active' : 'Inactive';
+                        
+                        row.innerHTML = `
+                            <td>${supplier.name || 'N/A'}</td>
+                            <td>${supplier.contact_person || 'N/A'}</td>
+                            <td>${supplier.email || 'N/A'}</td>
+                            <td>${supplier.phone || 'N/A'}</td>
+                            <td>${supplier.website ? `<a href="${supplier.website}" target="_blank">Visit</a>` : 'N/A'}</td>
+                            <td><span class="badge ${statusClass}">${statusText}</span></td>
+                            <td>
+                                <button class="btn btn-primary" onclick="editSupplier('${supplier.id}')">Edit</button>
+                                <button class="btn btn-danger" onclick="deleteSupplier('${supplier.id}')">Delete</button>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                } else {
+                    // No data - show empty state
+                    tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No suppliers found. <a href="#" onclick="showPage(\'import\', this)">Import your suppliers</a> to get started.</td></tr>';
+                }
+            } catch (error) {
+                console.error('Error loading suppliers:', error);
+                const tbody = document.getElementById('suppliersTableBody');
+                if (tbody) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">Error loading suppliers. Please refresh the page.</td></tr>';
+                }
             }
         }
 
         function editProduct(id) {
-            const data = dataManager.getData();
-            const product = data.products.find(p => p.id === id);
-            if (product) {
+            // Fetch product data from API
+            fetch(`${API_BASE_URL}/products/variants/${id}/`, {
+                credentials: 'include'
+            })
+            .then(response => response.json())
+            .then(product => {
                 // Create edit modal
                 const modal = document.createElement('div');
                 modal.className = 'modal';
@@ -1852,24 +2152,44 @@
                 document.body.appendChild(modal);
                 modal.style.display = 'block';
                 
-                document.getElementById('editProductForm').addEventListener('submit', function(e) {
+                document.getElementById('editProductForm').addEventListener('submit', async function(e) {
                     e.preventDefault();
                     const formData = new FormData(this);
                     const updates = {
                         name: formData.get('name'),
                         sku: formData.get('sku'),
-                        category: formData.get('category'),
-                        price: parseFloat(formData.get('price')),
-                        stock: parseInt(formData.get('stock')),
-                        reorderPoint: parseInt(formData.get('reorderPoint')),
+                        selling_price: parseFloat(formData.get('price')),
                         description: formData.get('description')
                     };
-                    dataManager.updateProduct(id, updates);
-                    closeModal('editProductModal');
-                    loadProductsTable();
-                    showNotification('Product updated successfully!');
+
+                    try {
+                        const response = await fetch(`${API_BASE_URL}/products/variants/${id}/`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            credentials: 'include',
+                            body: JSON.stringify(updates)
+                        });
+
+                        if (response.ok) {
+                            closeModal('editProductModal');
+                            loadProductsTable();
+                            showNotification(' Product updated successfully!');
+                        } else {
+                            const result = await response.json();
+                            showNotification(` Error updating product: ${result.detail || 'Unknown error'}`, 'error');
+                        }
+                    } catch (error) {
+                        console.error('Error updating product:', error);
+                        showNotification(` Network error updating product: ${error.message}`, 'error');
+                    }
                 });
-            }
+            })
+            .catch(error => {
+                console.error('Error fetching product:', error);
+                showNotification(' Error loading product data', 'error');
+            });
         }
 
         async function deleteProduct(sku) {
@@ -1895,21 +2215,21 @@
                             });
                             
                             if (deleteResponse.ok) {
-                                showNotification('✅ Product deleted successfully!');
+                                showNotification(' Product deleted successfully!');
                                 loadProductsTable(); // Refresh the table
                             } else {
                                 const errorData = await deleteResponse.json();
-                                showNotification(`❌ Error deleting product: ${errorData.detail || 'Unknown error'}`, 'error');
+                                showNotification(` Error deleting product: ${errorData.detail || 'Unknown error'}`, 'error');
                             }
                         } else {
-                            showNotification('❌ Product not found', 'error');
+                            showNotification(' Product not found', 'error');
                         }
                     } else {
-                        showNotification('❌ Error loading products', 'error');
+                        showNotification(' Error loading products', 'error');
                     }
                 } catch (error) {
                     console.error('Error deleting product:', error);
-                    showNotification(`❌ Network error: ${error.message}`, 'error');
+                    showNotification(` Network error: ${error.message}`, 'error');
                 }
             }
         }
@@ -1976,7 +2296,7 @@
                 console.log('CSRF Token:', csrfToken);
                 
                 if (!csrfToken) {
-                    showNotification('❌ CSRF token not found. Please refresh the page and try again.', 'error');
+                    showNotification(' CSRF token not found. Please refresh the page and try again.', 'error');
                     return;
                 }
                 
@@ -1995,7 +2315,7 @@
                 if (!response.ok) {
                     const errorText = await response.text();
                     console.error('Error response:', errorText);
-                    showNotification(`❌ Server error (${response.status}): ${errorText}`, 'error');
+                    showNotification(` Server error (${response.status}): ${errorText}`, 'error');
                     return;
                 }
                 
@@ -2006,28 +2326,404 @@
                     closeModal('addProductModal');
                     this.reset();
                     loadProductsTable();
-                    showNotification('✅ Product added successfully!');
+                    showNotification(' Product added successfully!');
                 } else {
-                    showNotification(`❌ Error adding product: ${result.error || 'Unknown error'}`, 'error');
+                    showNotification(` Error adding product: ${result.error || 'Unknown error'}`, 'error');
                 }
             } catch (error) {
                 console.error('Error adding product:', error);
-                showNotification(`❌ Network error adding product: ${error.message}`, 'error');
+                showNotification(` Network error adding product: ${error.message}`, 'error');
             }
         });
+
+        // Form handling for customer form
+        document.getElementById('addCustomerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const customerData = {
+                first_name: formData.get('first_name'),
+                last_name: formData.get('last_name'),
+                email: formData.get('email'),
+                phone: formData.get('phone'),
+                company: formData.get('company'),
+                address: formData.get('address'),
+                city: formData.get('city'),
+                state: formData.get('state'),
+                zip_code: formData.get('zip_code'),
+                country: formData.get('country'),
+                notes: formData.get('notes')
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/products/customers/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCSRFToken()
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify(customerData)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    closeModal('addCustomerModal');
+                    this.reset();
+                    loadCustomersTable();
+                    showNotification(' Customer added successfully!');
+                } else {
+                    showNotification(` Error adding customer: ${result.detail || 'Unknown error'}`, 'error');
+                }
+            } catch (error) {
+                console.error('Error adding customer:', error);
+                showNotification(` Network error adding customer: ${error.message}`, 'error');
+            }
+        });
+
+        // Form handling for supplier form
+        document.getElementById('addSupplierForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const supplierData = {
+                name: formData.get('name'),
+                contact_person: formData.get('contact_person'),
+                email: formData.get('email'),
+                phone: formData.get('phone'),
+                website: formData.get('website'),
+                address: formData.get('address'),
+                payment_terms: formData.get('payment_terms'),
+                notes: formData.get('notes')
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/products/suppliers/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCSRFToken()
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify(supplierData)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    closeModal('addSupplierModal');
+                    this.reset();
+                    loadSuppliersTable();
+                    showNotification(' Supplier added successfully!');
+                } else {
+                    showNotification(` Error adding supplier: ${result.detail || 'Unknown error'}`, 'error');
+                }
+            } catch (error) {
+                console.error('Error adding supplier:', error);
+                showNotification(` Network error adding supplier: ${error.message}`, 'error');
+            }
+        });
+
+        // Supplier Management Functions
+        function editSupplier(supplierId) {
+            // Fetch supplier data from API
+            fetch(`${API_BASE_URL}/products/suppliers/${supplierId}/`, {
+                credentials: 'include'
+            })
+            .then(response => response.json())
+            .then(supplier => {
+                // Create edit modal
+                const modal = document.createElement('div');
+                modal.className = 'modal';
+                modal.id = 'editSupplierModal';
+                modal.style.display = 'block';
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <span class="close" onclick="closeModal('editSupplierModal')">&times;</span>
+                        <h2>Edit Supplier</h2>
+                        <form id="editSupplierForm">
+                            <input type="hidden" name="id" value="${supplier.id}">
+                            <div class="form-group">
+                                <label class="form-label">Supplier Name *</label>
+                                <input type="text" class="form-control" name="name" value="${supplier.name || ''}" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Contact Person</label>
+                                <input type="text" class="form-control" name="contact_person" value="${supplier.contact_person || ''}">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" name="email" value="${supplier.email || ''}">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Phone</label>
+                                <input type="tel" class="form-control" name="phone" value="${supplier.phone || ''}">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Address</label>
+                                <textarea class="form-control" name="address" rows="3">${supplier.address || ''}</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Website</label>
+                                <input type="url" class="form-control" name="website" value="${supplier.website || ''}">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Payment Terms</label>
+                                <input type="text" class="form-control" name="payment_terms" value="${supplier.payment_terms || ''}">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Notes</label>
+                                <textarea class="form-control" name="notes" rows="3">${supplier.notes || ''}</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="is_active" ${supplier.is_active ? 'checked' : ''}> Active
+                                </label>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">Update Supplier</button>
+                                <button type="button" class="btn btn-secondary" onclick="closeModal('editSupplierModal')">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+
+                // Handle form submission
+                document.getElementById('editSupplierForm').addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    const formData = new FormData(this);
+                    const supplierData = {
+                        name: formData.get('name'),
+                        contact_person: formData.get('contact_person'),
+                        email: formData.get('email'),
+                        phone: formData.get('phone'),
+                        address: formData.get('address'),
+                        website: formData.get('website'),
+                        payment_terms: formData.get('payment_terms'),
+                        notes: formData.get('notes'),
+                        is_active: formData.get('is_active') === 'on'
+                    };
+
+                    try {
+                        const response = await fetch(`${API_BASE_URL}/products/suppliers/${supplierId}/`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            credentials: 'include',
+                            body: JSON.stringify(supplierData)
+                        });
+
+                        if (response.ok) {
+                            closeModal('editSupplierModal');
+                            loadSuppliersTable();
+                            showNotification(' Supplier updated successfully!');
+                        } else {
+                            const result = await response.json();
+                            showNotification(` Error updating supplier: ${result.detail || 'Unknown error'}`, 'error');
+                        }
+                    } catch (error) {
+                        console.error('Error updating supplier:', error);
+                        showNotification(` Network error updating supplier: ${error.message}`, 'error');
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching supplier:', error);
+                showNotification(' Error loading supplier data', 'error');
+            });
+        }
+
+        function deleteSupplier(supplierId) {
+            if (confirm('Are you sure you want to delete this supplier? This action cannot be undone.')) {
+                fetch(`${API_BASE_URL}/products/suppliers/${supplierId}/`, {
+                    method: 'DELETE',
+                    credentials: 'include'
+                })
+                .then(response => {
+                    if (response.ok) {
+                        loadSuppliersTable();
+                        showNotification(' Supplier deleted successfully!');
+                    } else {
+                        return response.json().then(result => {
+                            throw new Error(result.detail || 'Failed to delete supplier');
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error deleting supplier:', error);
+                    showNotification(` Error deleting supplier: ${error.message}`, 'error');
+                });
+            }
+        }
+
+        // Customer Management Functions  
+        function editCustomer(customerId) {
+            // Fetch customer data from API
+            fetch(`${API_BASE_URL}/products/customers/${customerId}/`, {
+                credentials: 'include'
+            })
+            .then(response => response.json())
+            .then(customer => {
+                // Create edit modal
+                const modal = document.createElement('div');
+                modal.className = 'modal';
+                modal.id = 'editCustomerModal';
+                modal.style.display = 'block';
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <span class="close" onclick="closeModal('editCustomerModal')">&times;</span>
+                        <h2>Edit Customer</h2>
+                        <form id="editCustomerForm">
+                            <input type="hidden" name="id" value="${customer.id}">
+                            <div class="form-group">
+                                <label class="form-label">First Name *</label>
+                                <input type="text" class="form-control" name="first_name" value="${customer.first_name || ''}" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Last Name *</label>
+                                <input type="text" class="form-control" name="last_name" value="${customer.last_name || ''}" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Email *</label>
+                                <input type="email" class="form-control" name="email" value="${customer.email || ''}" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Phone</label>
+                                <input type="tel" class="form-control" name="phone" value="${customer.phone || ''}">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Company</label>
+                                <input type="text" class="form-control" name="company" value="${customer.company || ''}">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Address</label>
+                                <textarea class="form-control" name="address" rows="3">${customer.address || ''}</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">City</label>
+                                <input type="text" class="form-control" name="city" value="${customer.city || ''}">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">State</label>
+                                <input type="text" class="form-control" name="state" value="${customer.state || ''}">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">ZIP Code</label>
+                                <input type="text" class="form-control" name="zip_code" value="${customer.zip_code || ''}">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Country</label>
+                                <input type="text" class="form-control" name="country" value="${customer.country || ''}">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Notes</label>
+                                <textarea class="form-control" name="notes" rows="3">${customer.notes || ''}</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="is_active" ${customer.is_active ? 'checked' : ''}> Active
+                                </label>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">Update Customer</button>
+                                <button type="button" class="btn btn-secondary" onclick="closeModal('editCustomerModal')">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+
+                // Handle form submission
+                document.getElementById('editCustomerForm').addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    const formData = new FormData(this);
+                    const customerData = {
+                        first_name: formData.get('first_name'),
+                        last_name: formData.get('last_name'),
+                        email: formData.get('email'),
+                        phone: formData.get('phone'),
+                        company: formData.get('company'),
+                        address: formData.get('address'),
+                        city: formData.get('city'),
+                        state: formData.get('state'),
+                        zip_code: formData.get('zip_code'),
+                        country: formData.get('country'),
+                        notes: formData.get('notes'),
+                        is_active: formData.get('is_active') === 'on'
+                    };
+
+                    try {
+                        const response = await fetch(`${API_BASE_URL}/products/customers/${customerId}/`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            credentials: 'include',
+                            body: JSON.stringify(customerData)
+                        });
+
+                        if (response.ok) {
+                            closeModal('editCustomerModal');
+                            loadCustomersTable();
+                            showNotification(' Customer updated successfully!');
+                        } else {
+                            const result = await response.json();
+                            showNotification(` Error updating customer: ${result.detail || 'Unknown error'}`, 'error');
+                        }
+                    } catch (error) {
+                        console.error('Error updating customer:', error);
+                        showNotification(` Network error updating customer: ${error.message}`, 'error');
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching customer:', error);
+                showNotification(' Error loading customer data', 'error');
+            });
+        }
+
+        function deleteCustomer(customerId) {
+            if (confirm('Are you sure you want to delete this customer? This action cannot be undone.')) {
+                fetch(`${API_BASE_URL}/products/customers/${customerId}/`, {
+                    method: 'DELETE',
+                    credentials: 'include'
+                })
+                .then(response => {
+                    if (response.ok) {
+                        loadCustomersTable();
+                        showNotification(' Customer deleted successfully!');
+                    } else {
+                        return response.json().then(result => {
+                            throw new Error(result.detail || 'Failed to delete customer');
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error deleting customer:', error);
+                    showNotification(` Error deleting customer: ${error.message}`, 'error');
+                });
+            }
+        }
 
         // Order Management Functions
         async function loadOrdersTable() {
             try {
-                const response = await fetch(`${API_BASE_URL}/tenants/dashboard/orders/`);
+                const response = await fetch(`${API_BASE_URL}/tenants/dashboard/orders/`, {
+                    credentials: 'include'
+                });
                 const result = await response.json();
+                console.log('Orders API response:', result);
                 const tbody = document.querySelector('#orders .table tbody');
                 
+                // Handle dashboard response format
+                const orders = result.success ? result.data : (result.results || result);
+                
                 if (tbody) {
-                    if (result.success && result.data && result.data.length > 0) {
+                    if (orders && orders.length > 0) {
                         tbody.innerHTML = '';
                         
-                        result.data.forEach(order => {
+                        orders.forEach(order => {
                             const row = document.createElement('tr');
                             const statusClass = order.status === 'completed' ? 'badge-success' : 
                                               order.status === 'processing' ? 'badge-warning' : 'badge-danger';
@@ -2047,10 +2743,15 @@
                         });
                         
                         // Update order stats
-                        document.getElementById('ordersPending').textContent = result.data.filter(order => order.status === 'pending').length;
-                        document.getElementById('ordersCompletedToday').textContent = result.data.filter(order => order.status === 'completed').length;
-                        document.getElementById('ordersTodayRevenue').textContent = `$${result.data.reduce((sum, order) => sum + (order.total_amount || 0), 0).toLocaleString()}`;
-                        document.getElementById('ordersOverdue').textContent = '0'; // Calculate overdue orders if needed
+                        const pendingElement = document.getElementById('ordersPending');
+                        const completedElement = document.getElementById('ordersCompletedToday');
+                        const revenueElement = document.getElementById('ordersTodayRevenue');
+                        const overdueElement = document.getElementById('ordersOverdue');
+                        
+                        if (pendingElement) pendingElement.textContent = orders.filter(order => order.status === 'pending').length;
+                        if (completedElement) completedElement.textContent = orders.filter(order => order.status === 'completed').length;
+                        if (revenueElement) revenueElement.textContent = `$${orders.reduce((sum, order) => sum + (order.total_amount || 0), 0).toLocaleString()}`;
+                        if (overdueElement) overdueElement.textContent = '0'; // Calculate overdue orders if needed
                     } else {
                         // No data - show empty state
                         tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No orders found. <a href="#" onclick="showPage(\'import\', this)">Import your orders</a> to get started.</td></tr>';
@@ -2207,15 +2908,21 @@
         // Inventory Management Functions
         async function loadInventoryTable() {
             try {
-                const response = await fetch(`${API_BASE_URL}/tenants/dashboard/inventory/`);
+                const response = await fetch(`${API_BASE_URL}/tenants/dashboard/inventory/`, {
+                    credentials: 'include'
+                });
                 const result = await response.json();
+                console.log('Inventory API response:', result);
                 const tbody = document.querySelector('#inventory .table tbody');
                 
+                // Handle dashboard response format
+                const inventory = result.success ? result.data : (result.results || result);
+                
                 if (tbody) {
-                    if (result.success && result.data && result.data.length > 0) {
+                    if (inventory && inventory.length > 0) {
                         tbody.innerHTML = '';
                         
-                        result.data.forEach(item => {
+                        inventory.forEach(item => {
                             const row = document.createElement('tr');
                             const statusClass = item.quantity <= (item.reorder_point || 10) ? 'badge-warning' : 'badge-success';
                             const statusText = item.quantity <= (item.reorder_point || 10) ? 'Low Stock' : 'In Stock';
@@ -2248,9 +2955,15 @@
         }
 
         function adjustStock(sku) {
-            const data = dataManager.getData();
-            const product = data.products.find(p => p.sku === sku);
-            if (product) {
+            // Fetch product data from API first
+            fetch(`${API_BASE_URL}/products/variants/?search=${sku}`, {
+                credentials: 'include'
+            })
+            .then(response => response.json())
+            .then(result => {
+                const products = result.results || result;
+                const product = products.find(p => p.sku === sku);
+                if (product) {
                 const modal = document.createElement('div');
                 modal.className = 'modal';
                 modal.id = 'adjustStockModal';
@@ -2297,33 +3010,62 @@
                 document.body.appendChild(modal);
                 modal.style.display = 'block';
                 
-                document.getElementById('adjustStockForm').addEventListener('submit', function(e) {
+                document.getElementById('adjustStockForm').addEventListener('submit', async function(e) {
                     e.preventDefault();
                     const formData = new FormData(this);
                     const adjustmentType = formData.get('adjustmentType');
                     const quantity = parseInt(formData.get('quantity'));
-                    let newStock = product.stock;
+                    const reason = formData.get('reason');
+                    const notes = formData.get('notes');
                     
-                    if (adjustmentType === 'add') {
-                        newStock += quantity;
-                    } else if (adjustmentType === 'subtract') {
-                        newStock -= quantity;
-                    } else if (adjustmentType === 'set') {
-                        newStock = quantity;
+                    try {
+                        // Create stock adjustment via API
+                        const response = await fetch(`${API_BASE_URL}/api/inventory/adjustments/`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            credentials: 'include',
+                            body: JSON.stringify({
+                                product_sku: sku,
+                                adjustment_type: adjustmentType,
+                                quantity: quantity,
+                                reason: reason,
+                                notes: notes
+                            })
+                        });
+
+                        if (response.ok) {
+                            closeModal('adjustStockModal');
+                            loadInventoryTable();
+                            showNotification(' Stock adjusted successfully!');
+                        } else {
+                            const result = await response.json();
+                            showNotification(` Error adjusting stock: ${result.detail || 'Unknown error'}`, 'error');
+                        }
+                    } catch (error) {
+                        console.error('Error adjusting stock:', error);
+                        showNotification(` Network error adjusting stock: ${error.message}`, 'error');
                     }
-                    
-                    dataManager.updateProduct(product.id, { stock: newStock });
-                    closeModal('adjustStockModal');
-                    loadInventoryTable();
-                    showNotification(`Stock adjusted successfully! New stock: ${newStock}`);
                 });
-            }
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching product:', error);
+                showNotification(' Error loading product data', 'error');
+            });
         }
 
         function reorder(sku) {
-            const data = dataManager.getData();
-            const product = data.products.find(p => p.sku === sku);
-            if (product) {
+            // Fetch product data from API first
+            fetch(`${API_BASE_URL}/products/variants/?search=${sku}`, {
+                credentials: 'include'
+            })
+            .then(response => response.json())
+            .then(result => {
+                const products = result.results || result;
+                const product = products.find(p => p.sku === sku);
+                if (product) {
                 const reorderQuantity = product.reorderPoint * 2;
                 const modal = document.createElement('div');
                 modal.className = 'modal';
@@ -2366,36 +3108,48 @@
                 document.body.appendChild(modal);
                 modal.style.display = 'block';
                 
-                document.getElementById('reorderForm').addEventListener('submit', function(e) {
+                document.getElementById('reorderForm').addEventListener('submit', async function(e) {
                     e.preventDefault();
                     const formData = new FormData(this);
-                    const reorder = {
-                        product: product.name,
-                        sku: product.sku,
-                        quantity: parseInt(formData.get('quantity')),
-                        supplier: formData.get('supplier'),
-                        deliveryDate: formData.get('deliveryDate'),
-                        status: 'Pending',
-                        date: new Date().toISOString().split('T')[0]
-                    };
                     
-                    // Add to orders as purchase order
-                    dataManager.addOrder({
-                        customer: formData.get('supplier'),
-                        date: new Date().toISOString().split('T')[0],
-                        total: product.price * reorder.quantity,
-                        status: 'Pending',
-                        items: [{
-                            product: product.name,
-                            quantity: reorder.quantity,
-                            price: product.price
-                        }]
-                    });
-                    
-                    closeModal('reorderModal');
-                    showNotification(`Reorder created successfully for ${reorder.quantity} units!`);
+                    try {
+                        // Create purchase order via dashboard endpoint
+                        const response = await fetch(`${API_BASE_URL}/tenants/dashboard/orders/`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            credentials: 'include',
+                            body: JSON.stringify({
+                                customer_name: formData.get('supplier'),
+                                customer_email: `${formData.get('supplier').toLowerCase().replace(/\s+/g, '')}@supplier.com`,
+                                order_date: new Date().toISOString().split('T')[0],
+                                status: 'pending',
+                                total_amount: product.selling_price * parseInt(formData.get('quantity')),
+                                notes: `Reorder for ${product.name} - Expected delivery: ${formData.get('deliveryDate')}`
+                            })
+                        });
+
+                        if (response.ok) {
+                            closeModal('reorderModal');
+                            loadInventoryTable();
+                            loadOrdersTable();
+                            showNotification(` Reorder created successfully for ${formData.get('quantity')} units!`);
+                        } else {
+                            const result = await response.json();
+                            showNotification(` Error creating reorder: ${result.detail || 'Unknown error'}`, 'error');
+                        }
+                    } catch (error) {
+                        console.error('Error creating reorder:', error);
+                        showNotification(` Network error creating reorder: ${error.message}`, 'error');
+                    }
                 });
-            }
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching product:', error);
+                showNotification(' Error loading product data', 'error');
+            });
         }
 
         function bulkStockUpdate() {
@@ -2585,7 +3339,7 @@
             modal.innerHTML = `
                 <div class="modal-content" style="max-width: 800px;">
                     <span class="close" onclick="closeModal('shopifyConfigModal')">&times;</span>
-                    <h2>🛒 Shopify Integration Setup</h2>
+                    <h2> Shopify Integration Setup</h2>
                     <div class="card">
                         <h3>Step 1: Get Your Shopify Credentials</h3>
                         <p>To connect your Shopify store, you'll need:</p>
@@ -2653,7 +3407,7 @@
                 // Simulate API call
                 setTimeout(() => {
                     closeModal('shopifyConfigModal');
-                    showNotification('Shopify store connected successfully! 🎉');
+                    showNotification('Shopify store connected successfully! ');
                     // Update integration status
                     updateIntegrationStatus('shopify', 'connected');
                 }, 2000);
@@ -2675,7 +3429,7 @@
             modal.innerHTML = `
                 <div class="modal-content" style="max-width: 800px;">
                     <span class="close" onclick="closeModal('woocommerceConfigModal')">&times;</span>
-                    <h2>🛍️ WooCommerce Integration Setup</h2>
+                    <h2> WooCommerce Integration Setup</h2>
                     <div class="card">
                         <h3>Step 1: Get Your WooCommerce Credentials</h3>
                         <p>To connect your WooCommerce store, you'll need:</p>
@@ -2736,7 +3490,7 @@
                 
                 setTimeout(() => {
                     closeModal('woocommerceConfigModal');
-                    showNotification('WooCommerce store connected successfully! 🎉');
+                    showNotification('WooCommerce store connected successfully! ');
                     updateIntegrationStatus('woocommerce', 'connected');
                 }, 2000);
             });
@@ -2749,7 +3503,7 @@
             modal.innerHTML = `
                 <div class="modal-content" style="max-width: 800px;">
                     <span class="close" onclick="closeModal('amazonConfigModal')">&times;</span>
-                    <h2>📦 Amazon Integration Setup</h2>
+                    <h2> Amazon Integration Setup</h2>
                     <div class="card">
                         <h3>Step 1: Amazon Seller Central Setup</h3>
                         <p>To connect your Amazon seller account, you'll need:</p>
@@ -2819,7 +3573,7 @@
                 
                 setTimeout(() => {
                     closeModal('amazonConfigModal');
-                    showNotification('Amazon account connected successfully! 🎉');
+                    showNotification('Amazon account connected successfully! ');
                     updateIntegrationStatus('amazon', 'connected');
                 }, 2000);
             });
@@ -2839,7 +3593,7 @@
             modal.innerHTML = `
                 <div class="modal-content" style="max-width: 800px;">
                     <span class="close" onclick="closeModal('quickbooksConfigModal')">&times;</span>
-                    <h2>💰 QuickBooks Integration Setup</h2>
+                    <h2> QuickBooks Integration Setup</h2>
                     <div class="card">
                         <h3>Step 1: QuickBooks Online Setup</h3>
                         <p>To connect your QuickBooks account, you'll need:</p>
@@ -2911,7 +3665,7 @@
                 
                 setTimeout(() => {
                     closeModal('quickbooksConfigModal');
-                    showNotification('QuickBooks connected successfully! 🎉');
+                    showNotification('QuickBooks connected successfully! ');
                     updateIntegrationStatus('quickbooks', 'connected');
                 }, 2000);
             });
@@ -2983,7 +3737,7 @@
                 
                 setTimeout(() => {
                     closeModal('mailchimpConfigModal');
-                    showNotification('Mailchimp connected successfully! 🎉');
+                    showNotification('Mailchimp connected successfully! ');
                     updateIntegrationStatus('mailchimp', 'connected');
                 }, 2000);
             });
@@ -3245,6 +3999,13 @@
                 console.error('Error setting up file upload:', error);
             }
             
+            // Setup template type selection
+            try {
+                setupTemplateTypeSelection();
+            } catch (error) {
+                console.error('Error setting up template type selection:', error);
+            }
+            
             // Load user management data
             try {
                 loadUserManagement();
@@ -3480,11 +4241,11 @@
             // Update AI status
             document.getElementById('aiStatus').innerHTML = `
                 <div class="ai-status-item">
-                    <span class="status-icon">📊</span>
+                    <span class="status-icon"></span>
                     <span class="status-text">No data available</span>
                 </div>
                 <div class="ai-status-item">
-                    <span class="status-icon">🤖</span>
+                    <span class="status-icon"></span>
                     <span class="status-text">Import your data to enable AI insights</span>
                 </div>
             `;
@@ -3511,7 +4272,7 @@
             // Update prediction section
             document.getElementById('predictionResults').innerHTML = `
                 <div class="empty-state">
-                    <div class="empty-icon">📈</div>
+                    <div class="empty-icon"></div>
                     <h4>No Predictions Available</h4>
                     <p>Import your product and sales data to get AI-powered demand predictions.</p>
                     <button class="btn btn-primary" onclick="showPage('import')">Import Data</button>
@@ -3521,7 +4282,7 @@
             // Update optimization section
             document.getElementById('optimizationResults').innerHTML = `
                 <div class="empty-state">
-                    <div class="empty-icon">⚡</div>
+                    <div class="empty-icon"></div>
                     <h4>No Optimization Available</h4>
                     <p>Import your inventory data to get AI-powered optimization recommendations.</p>
                     <button class="btn btn-primary" onclick="showPage('import')">Import Data</button>
@@ -3546,7 +4307,7 @@
                 
                 if (data.success) {
                     const insights = data.insights;
-                    document.getElementById('modelsLoaded').textContent = insights.models_status.loaded ? '✅ Yes' : '❌ No';
+                    document.getElementById('modelsLoaded').textContent = insights.models_status.loaded ? ' Yes' : ' No';
                     document.getElementById('forecastingModels').textContent = insights.models_status.forecasting_models;
                     document.getElementById('productsOptimized').textContent = insights.models_status.optimization_rules;
                     document.getElementById('modelAccuracy').textContent = `${(insights.performance_metrics.accuracy * 100).toFixed(1)}%`;
@@ -3557,11 +4318,11 @@
                     document.getElementById('optimizations').textContent = insights.recommendations.total_products_optimized;
                 } else {
                     console.error('API returned success: false');
-                    document.getElementById('modelsLoaded').textContent = '❌ API Error';
+                    document.getElementById('modelsLoaded').textContent = ' API Error';
                 }
             } catch (error) {
                 console.error('Error loading AI status:', error);
-                document.getElementById('modelsLoaded').textContent = '❌ Error';
+                document.getElementById('modelsLoaded').textContent = ' Error';
                 document.getElementById('forecastingModels').textContent = 'Error';
                 document.getElementById('productsOptimized').textContent = 'Error';
                 document.getElementById('modelAccuracy').textContent = 'Error';
@@ -3713,7 +4474,7 @@
                     const prediction = data.prediction;
                     resultDiv.innerHTML = `
                         <div class="alert alert-success">
-                            <h4>🎯 Demand Prediction Results</h4>
+                            <h4> Demand Prediction Results</h4>
                             <p><strong>Predicted Demand:</strong> ${prediction.predicted_demand} units</p>
                             <p><strong>Confidence Level:</strong> ${(prediction.confidence * 100).toFixed(1)}%</p>
                             <p><strong>Model Used:</strong> ${prediction.model_used}</p>
@@ -3740,7 +4501,7 @@
             }
 
             try {
-                resultDiv.innerHTML = '<div class="alert alert-info">⚡ Getting optimization recommendations...</div>';
+                resultDiv.innerHTML = '<div class="alert alert-info"> Getting optimization recommendations...</div>';
                 
                 const response = await fetch(`${ML_API_BASE}/optimize/${productSelect.value}/`);
                 const data = await response.json();
@@ -3749,7 +4510,7 @@
                     const recommendations = data.recommendations;
                     resultDiv.innerHTML = `
                         <div class="alert alert-success">
-                            <h4>🎯 Optimization Recommendations</h4>
+                            <h4> Optimization Recommendations</h4>
                             <div class="stats-grid">
                                 <div class="stat-card">
                                     <div class="stat-number">${recommendations.reorder_point}</div>
@@ -4058,64 +4819,55 @@
 
         // Import Data Functions
         function downloadTemplate(templateType) {
-            // Create template data directly in JavaScript to avoid authentication issues
-            const templates = {
-                products: {
-                    headers: ['sku', 'name', 'description', 'category', 'brand', 'supplier', 'selling_price', 'cost_price', 'barcode'],
-                    sampleData: [
-                        ['PROD001', 'Sample Product A', 'Description for Product A', 'Electronics', 'BrandX', 'SupplierY', '19.99', '10.00', '1234567890123'],
-                        ['PROD002', 'Sample Product B', 'Description for Product B', 'Clothing', 'BrandZ', 'SupplierW', '29.99', '15.00', '3210987654321'],
-                        ['PROD003', 'Sample Product C', 'Description for Product C', 'Home & Garden', 'BrandA', 'SupplierB', '49.99', '25.00', '4567891234567']
-                    ]
-                },
-                inventory: {
-                    headers: ['product_sku', 'warehouse', 'quantity', 'reorder_point', 'location'],
-                    sampleData: [
-                        ['PROD001', 'Main Warehouse', '100', '20', 'Aisle 1, Shelf 3'],
-                        ['PROD002', 'Main Warehouse', '50', '10', 'Aisle 2, Shelf 1'],
-                        ['PROD003', 'Secondary Warehouse', '75', '15', 'Aisle 3, Shelf 2']
-                    ]
-                },
-                customers: {
-                    headers: ['first_name', 'last_name', 'email', 'phone', 'address'],
-                    sampleData: [
-                        ['John', 'Doe', 'john.doe@example.com', '555-1234', '123 Main St, Anytown, USA'],
-                        ['Jane', 'Smith', 'jane.smith@example.com', '555-5678', '456 Oak Ave, Otherville, USA'],
-                        ['Bob', 'Johnson', 'bob.johnson@example.com', '555-9012', '789 Pine Rd, Somewhere, USA']
-                    ]
-                },
-                suppliers: {
-                    headers: ['name', 'contact_person', 'email', 'phone', 'address'],
-                    sampleData: [
-                        ['Supplier A Inc', 'Alice Johnson', 'alice@supplierA.com', '111-222-3333', '789 Pine Ln, Supplier City, SC 12345'],
-                        ['Global Parts Ltd', 'Bob Williams', 'bob@globalparts.com', '444-555-6666', '101 Industrial Rd, Parts Town, PT 67890'],
-                        ['Quality Goods Co', 'Carol Davis', 'carol@qualitygoods.com', '777-888-9999', '555 Commerce St, Business City, BC 54321']
-                    ]
-                }
-            };
-            
-            const template = templates[templateType];
-            if (!template) {
-                alert('Template not found');
-                return;
-            }
-            
-            // Create CSV content
-            let csvContent = template.headers.join(',') + '\n';
-            template.sampleData.forEach(row => {
-                csvContent += row.join(',') + '\n';
-            });
-            
-            // Create and download file
-            const blob = new Blob([csvContent], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
+            // Download template from backend
             const link = document.createElement('a');
-            link.href = url;
+            link.href = `${API_BASE_URL}/tenants/import/download-template/${templateType}/`;
             link.download = `${templateType}_template.csv`;
+            link.style.display = 'none';
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            window.URL.revokeObjectURL(url);
+        }
+
+        function setupTemplateTypeSelection() {
+            const templateTypeSelect = document.getElementById('templateType');
+            const uploadArea = document.getElementById('uploadArea');
+            
+            if (templateTypeSelect && uploadArea) {
+                templateTypeSelect.addEventListener('change', function() {
+                    const selectedType = this.value;
+                    if (selectedType) {
+                        // Update upload area text to show selected template type
+                        const uploadContent = uploadArea.querySelector('.upload-content h4');
+                        if (uploadContent) {
+                            const templateNames = {
+                                'products': ' Products',
+                                'inventory': ' Inventory',
+                                'orders': ' Orders',
+                                'customers': ' Customers',
+                                'suppliers': ' Suppliers'
+                            };
+                            uploadContent.textContent = `Drag & Drop ${templateNames[selectedType]} CSV files here`;
+                        }
+                        
+                        // Enable upload area
+                        uploadArea.style.opacity = '1';
+                        uploadArea.style.pointerEvents = 'auto';
+                    } else {
+                        // Reset upload area
+                        const uploadContent = uploadArea.querySelector('.upload-content h4');
+                        if (uploadContent) {
+                            uploadContent.textContent = 'Drag & Drop CSV files here';
+                        }
+                        uploadArea.style.opacity = '0.6';
+                        uploadArea.style.pointerEvents = 'none';
+                    }
+                });
+                
+                // Initially disable upload area
+                uploadArea.style.opacity = '0.6';
+                uploadArea.style.pointerEvents = 'none';
+            }
         }
 
         function showHelp(helpType) {
@@ -4236,7 +4988,7 @@
                 // Validate required fields
                 if (type === 'products') {
                     if (!data.sku || !data.name || !data.selling_price || !data.cost_price) {
-                        showNotification('❌ Please fill in all required fields (SKU, Name, Selling Price, Cost Price)', 'error');
+                        showNotification(' Please fill in all required fields (SKU, Name, Selling Price, Cost Price)', 'error');
                         return;
                     }
                 }
@@ -4246,7 +4998,7 @@
                 console.log('CSRF Token:', csrfToken);
                 
                 if (!csrfToken) {
-                    showNotification('❌ CSRF token not found. Please refresh the page and try again.', 'error');
+                    showNotification(' CSRF token not found. Please refresh the page and try again.', 'error');
                     return;
                 }
                 
@@ -4266,7 +5018,7 @@
                 if (!response.ok) {
                     const errorText = await response.text();
                     console.error('Error response:', errorText);
-                    showNotification(`❌ Server error (${response.status}): ${errorText}`, 'error');
+                    showNotification(` Server error (${response.status}): ${errorText}`, 'error');
                     return;
                 }
                 
@@ -4274,7 +5026,7 @@
                 console.log('Response result:', result);
                 
                 if (result.success) {
-                    showNotification(`✅ ${type.charAt(0).toUpperCase() + type.slice(1)} added successfully!`);
+                    showNotification(` ${type.charAt(0).toUpperCase() + type.slice(1)} added successfully!`);
                     
                     // Clear form based on type
                     let formId;
@@ -4320,11 +5072,11 @@
                     }
                 } else {
                     console.error('API returned error:', result);
-                    showNotification(`❌ Error adding ${type}: ${result.error || 'Unknown error'}`, 'error');
+                    showNotification(` Error adding ${type}: ${result.error || 'Unknown error'}`, 'error');
                 }
             } catch (error) {
                 console.error(`Error adding ${type}:`, error);
-                showNotification(`❌ Network error adding ${type}: ${error.message}`, 'error');
+                showNotification(` Network error adding ${type}: ${error.message}`, 'error');
             }
         }
         
@@ -4416,7 +5168,7 @@
                 let html = '<div class="results-summary">';
                 
                 if (results.success) {
-                    html += '<div class="success-message">✅ Upload completed successfully!</div>';
+                    html += '<div class="success-message"> Upload completed successfully!</div>';
                     html += `<p>Successfully imported ${results.count || 0} records.</p>`;
                     
                     if (results.message) {
@@ -4436,7 +5188,7 @@
                         loadDashboardCharts();
                     }, 1000);
                 } else {
-                    html += '<div class="error-message">❌ Upload failed</div>';
+                    html += '<div class="error-message"> Upload failed</div>';
                     html += `<p><strong>Error:</strong> ${results.error || 'Unknown error'}</p>`;
                     
                     if (results.details) {
@@ -4509,23 +5261,23 @@
                 let completed = 0;
                 const total = files.length;
 
+                // Get selected template type
+                const templateTypeSelect = document.getElementById('templateType');
+                const selectedTemplateType = templateTypeSelect.value;
+                
+                if (!selectedTemplateType) {
+                    showResults({ success: false, error: 'Please select a template type before uploading files.' });
+                    return;
+                }
+
                 Array.from(files).forEach((file, index) => {
                     if (!file.name.endsWith('.csv')) {
                         showResults({ success: false, error: `${file.name} is not a CSV file` });
                         return;
                     }
 
-                    // Determine file type from filename
-                    const fileName = file.name.toLowerCase();
-                    let fileType = 'products'; // default
-                    
-                    if (fileName.includes('inventory') || fileName.includes('stock')) {
-                        fileType = 'inventory';
-                    } else if (fileName.includes('customer')) {
-                        fileType = 'customers';
-                    } else if (fileName.includes('supplier')) {
-                        fileType = 'suppliers';
-                    }
+                    // Use the selected template type
+                    const fileType = selectedTemplateType;
 
                     uploadCSV(file, fileType)
                         .then(result => {

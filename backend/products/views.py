@@ -3,9 +3,9 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema
-from .models import Category, Supplier, Product, ProductVariant, ProductImage
+from .models import Category, Customer, Supplier, Product, ProductVariant, ProductImage
 from .serializers import (
-    CategorySerializer, SupplierSerializer, ProductSerializer,
+    CategorySerializer, CustomerSerializer, SupplierSerializer, ProductSerializer,
     ProductVariantSerializer, ProductImageSerializer
 )
 
@@ -33,6 +33,24 @@ class CategoryViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
+class CustomerViewSet(viewsets.ModelViewSet):
+    """ViewSet for managing customers"""
+    queryset = Customer.objects.all()
+    serializer_class = CustomerSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['is_active', 'country']
+    search_fields = ['first_name', 'last_name', 'email', 'company']
+    ordering_fields = ['last_name', 'first_name', 'created_at']
+    ordering = ['last_name', 'first_name']
+    
+    def get_queryset(self):
+        """Filter customers by tenant"""
+        if hasattr(self.request.user, 'tenant') and self.request.user.tenant:
+            return Customer.objects.filter(tenant=self.request.user.tenant)
+        return Customer.objects.none()
+
+
 class SupplierViewSet(viewsets.ModelViewSet):
     """ViewSet for managing suppliers"""
     queryset = Supplier.objects.all()
@@ -43,6 +61,12 @@ class SupplierViewSet(viewsets.ModelViewSet):
     search_fields = ['name', 'contact_person', 'email']
     ordering_fields = ['name', 'created_at']
     ordering = ['name']
+    
+    def get_queryset(self):
+        """Filter suppliers by tenant"""
+        if hasattr(self.request.user, 'tenant') and self.request.user.tenant:
+            return Supplier.objects.filter(tenant=self.request.user.tenant)
+        return Supplier.objects.none()
 
 
 class ProductViewSet(viewsets.ModelViewSet):

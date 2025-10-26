@@ -1,0 +1,6 @@
+sku,name,description,category,supplier,price,stock,barcode
+PROD001,iPhone 15 Pro,Latest iPhone with advanced features,Electronics,Tech Distributors Inc,999.99,25,1234567890123
+PROD002,Samsung Galaxy S24,Flagship Android smartphone,Electronics,Global Parts Ltd,799.99,15,2345678901234
+PROD003,MacBook Pro M3,Professional laptop for creators,Electronics,Tech Distributors Inc,1999.99,8,3456789012345
+PROD004,Cotton T-Shirt,100% cotton comfortable t-shirt,Clothing,Fashion Supply Co,15.99,200,4567890123456
+PROD005,Wireless Headphones,Noise-cancelling wireless headphones,Electronics,Tech Distributors Inc,99.99,75,5678901234567

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Category, Supplier, Product, ProductVariant, ProductImage
+from .models import Category, Customer, Supplier, Product, ProductVariant, ProductImage
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -19,6 +19,21 @@ class CategorySerializer(serializers.ModelSerializer):
         """Get child categories"""
         children = obj.children.filter(is_active=True)
         return CategorySerializer(children, many=True).data
+
+
+class CustomerSerializer(serializers.ModelSerializer):
+    """Serializer for Customer model"""
+    
+    full_name = serializers.ReadOnlyField()
+    
+    class Meta:
+        model = Customer
+        fields = [
+            'id', 'first_name', 'last_name', 'full_name', 'email', 'phone',
+            'address', 'city', 'state', 'zip_code', 'country', 'company',
+            'is_active', 'notes', 'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'created_at', 'updated_at']
 
 
 class SupplierSerializer(serializers.ModelSerializer):

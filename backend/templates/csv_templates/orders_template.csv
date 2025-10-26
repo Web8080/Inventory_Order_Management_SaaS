@@ -1,0 +1,6 @@
+order_number,customer_name,customer_email,customer_phone,product_sku,quantity,unit_price,total_price,order_date,status
+ORD001,John Doe,john.doe@example.com,555-1234,PROD001,2,999.99,1999.98,2024-01-15,completed
+ORD002,Jane Smith,jane.smith@example.com,555-5678,PROD002,1,799.99,799.99,2024-01-16,processing
+ORD003,Bob Johnson,bob.johnson@example.com,555-9012,PROD003,1,1999.99,1999.99,2024-01-17,pending
+ORD004,Alice Brown,alice.brown@example.com,555-2468,PROD004,5,15.99,79.95,2024-01-18,shipped
+ORD005,Charlie Wilson,charlie.wilson@example.com,555-1357,PROD005,3,99.99,299.97,2024-01-19,delivered

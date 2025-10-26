@@ -144,20 +144,20 @@ def create_training_metrics_chart():
     
     # Create summary text
     summary_text = f"""
-    🏆 BEST MODEL: {best_model.get('model_name', 'N/A').upper()}
+ BEST MODEL: {best_model.get('model_name', 'N/A').upper()}
     
-    📊 Performance Metrics:
+ Performance Metrics:
     • MAE: {best_model.get('mae', 0):.2f}
     • RMSE: {best_model.get('rmse', 0):.2f}
     • R² Score: {best_model.get('r2', 0) * 100:.1f}%
     
-    📈 Training Summary:
+ Training Summary:
     • Total Models Trained: {len(models)}
     • Training Time: ~2.5 minutes
     • Dataset Size: 61,451+ records
     • Features: 44 engineered features
     
-    🎯 Business Impact:
+ Business Impact:
     • Improved forecasting accuracy
     • Reduced inventory costs
     • Better demand planning
@@ -233,7 +233,7 @@ def create_dataset_overview_chart():
     ax4.axis('off')
     
     timeline_text = """
-    🚀 ML Training Pipeline Timeline
+ ML Training Pipeline Timeline
     
     1. Data Generation (30s)
        • 61,451+ synthetic records
@@ -260,7 +260,7 @@ def create_dataset_overview_chart():
        • Real-time predictions
        • Frontend integration
     
-    ⏱️ Total Time: ~3.5 minutes
+ Total Time: ~3.5 minutes
     """
     
     ax4.text(0.1, 0.9, timeline_text, transform=ax4.transAxes, fontsize=11,
@@ -363,7 +363,7 @@ def create_architecture_diagram():
 
 def main():
     """Create all ML visualizations."""
-    print("🎨 Creating ML training visualizations...")
+    print(" Creating ML training visualizations...")
     
     # Set style
     plt.style.use('seaborn-v0_8')
@@ -400,11 +400,11 @@ def main():
     except Exception as e:
         print(f"Error creating architecture diagram: {e}")
     
-    print(f"\n✅ Created {len(charts)} visualization(s):")
+    print(f"\n Created {len(charts)} visualization(s):")
     for chart in charts:
-        print(f"  📊 {chart}")
+        print(f"   {chart}")
     
-    print("\n🎯 Visualizations ready for README documentation!")
+    print("\n Visualizations ready for README documentation!")
 
 if __name__ == '__main__':
     main()

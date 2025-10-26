@@ -96,9 +96,10 @@ def upload_csv(request):
             })
         
         # Process based on import type
+        # Re-create CSV reader since the previous one was consumed
+        csv_reader = csv.DictReader(io.StringIO(content))
+        
         if import_type == 'products':
-            # Create a new reader from the content since the previous one was consumed
-            csv_reader = csv.DictReader(io.StringIO(content))
             count = import_products(tenant, csv_reader)
         elif import_type == 'customers':
             count = import_customers(tenant, csv_reader)
@@ -106,6 +107,8 @@ def upload_csv(request):
             count = import_inventory(tenant, csv_reader)
         elif import_type == 'suppliers':
             count = import_suppliers(tenant, csv_reader)
+        elif import_type == 'orders':
+            count = import_orders(tenant, csv_reader)
         else:
             return JsonResponse({'error': 'Invalid import type.'}, status=400)
         
@@ -164,8 +167,14 @@ def import_products(tenant, csv_reader):
                         'description': row.get('description', ''),
                         'category': category,
                         'supplier': supplier,
+                        'cost_price': Decimal('0.00'),  # Default cost price
+                        'selling_price': Decimal(row.get('price', row.get('selling_price', '0.00'))),
+                        'unit': 'piece',  # Default unit
+                        'reorder_point': 10,  # Default reorder point
+                        'reorder_quantity': 50,  # Default reorder quantity
                         'barcode': row.get('barcode', ''),
-                        'is_active': True
+                        'is_active': True,
+                        'is_tracked': True
                     }
                 )
                 if created:
@@ -191,6 +200,42 @@ def import_products(tenant, csv_reader):
                 else:
                     print(f"Using existing variant: {variant.sku} (ID: {variant.id})")
                 
+                # Create initial stock if stock quantity is provided
+                stock_quantity = row.get('stock', '')
+                if stock_quantity and stock_quantity.isdigit():
+                    from inventory.models import Warehouse, StockItem
+                    
+                    # Get or create default warehouse
+                    warehouse, warehouse_created = Warehouse.objects.get_or_create(
+                        tenant=tenant,
+                        code='MAIN',
+                        defaults={
+                            'name': f"{tenant.name} Main Warehouse",
+                            'address': "Main warehouse location",
+                            'is_default': True,
+                            'is_active': True
+                        }
+                    )
+                    
+                    # Create stock item
+                    stock_item, stock_created = StockItem.objects.get_or_create(
+                        tenant=tenant,
+                        product=product,
+                        warehouse=warehouse,
+                        defaults={
+                            'quantity': int(stock_quantity),
+                            'reserved_quantity': 0
+                        }
+                    )
+                    
+                    if stock_created:
+                        print(f"Created initial stock: {stock_quantity} units for {product.name}")
+                    else:
+                        # Update existing stock
+                        stock_item.quantity = int(stock_quantity)
+                        stock_item.save()
+                        print(f"Updated stock: {stock_quantity} units for {product.name}")
+                
                 imported_count += 1
                 
             except Exception as e:
@@ -205,130 +250,292 @@ def import_products(tenant, csv_reader):
 
 def import_customers(tenant, csv_reader):
     """Import customers from CSV"""
+    from products.models import Customer
+    
     imported_count = 0
+    error_count = 0
     
     with transaction.atomic():
-        for row in csv_reader:
+        for row_num, row in enumerate(csv_reader, 1):
             try:
-                # Create customer (stored as User with role 'customer')
-                from .models import User
-                customer = User.objects.create_user(
-                    username=f"customer_{row.get('email', f'customer_{imported_count}')}",
-                    email=row.get('email', f'customer{imported_count}@example.com'),
-                    first_name=row.get('first_name', 'Customer'),
-                    last_name=row.get('last_name', 'Name'),
-                    phone=row.get('phone', ''),
+                print(f"Processing customer row {row_num}: {row}")
+                
+                customer, created = Customer.objects.get_or_create(
                     tenant=tenant,
-                    role='customer',
-                    is_active=True
+                    email=row.get('email', ''),
+                    defaults={
+                        'first_name': row.get('first_name', 'Unknown'),
+                        'last_name': row.get('last_name', 'Customer'),
+                        'phone': row.get('phone', ''),
+                        'address': row.get('address', ''),
+                        'city': row.get('city', ''),
+                        'state': row.get('state', ''),
+                        'zip_code': row.get('zip_code', ''),
+                        'country': row.get('country', ''),
+                        'company': row.get('company', ''),
+                        'is_active': True,  # Default to active
+                        'notes': row.get('notes', '')
+                    }
                 )
                 
-                imported_count += 1
+                if created:
+                    imported_count += 1
+                    print(f"Created customer: {customer.full_name}")
+                else:
+                    print(f"Customer already exists: {customer.full_name}")
                 
             except Exception as e:
-                print(f"Error importing customer row: {e}")
+                error_count += 1
+                print(f"Error importing customer row {row_num}: {e}")
+                print(f"Row data: {row}")
                 continue
     
+    print(f"Customer import completed: {imported_count} customers imported, {error_count} errors")
     return imported_count
 
 
 def import_inventory(tenant, csv_reader):
     """Import inventory from CSV"""
+    from inventory.models import Warehouse, StockItem
+    from products.models import Product, ProductVariant
+    
     imported_count = 0
+    error_count = 0
     
     with transaction.atomic():
-        # Get default warehouse
-        warehouse = Warehouse.objects.filter(tenant=tenant, is_default=True).first()
-        if not warehouse:
-            warehouse = Warehouse.objects.create(
-                tenant=tenant,
-                name=f"{tenant.name} Main Warehouse",
-                code='MAIN',
-                address="123 Main Street",
-                is_default=True,
-                is_active=True
-            )
-        
-        for row in csv_reader:
+        for row_num, row in enumerate(csv_reader, 1):
             try:
+                print(f"Processing inventory row {row_num}: {row}")
+                
                 # Find product by SKU
                 sku = row.get('product_sku', '')
                 if not sku:
+                    print(f"No product SKU found in row {row_num}")
                     continue
                 
                 try:
-                    variant = ProductVariant.objects.get(sku=sku, product__tenant=tenant)
-                except ProductVariant.DoesNotExist:
+                    product = Product.objects.get(sku=sku, tenant=tenant)
+                except Product.DoesNotExist:
+                    print(f"Product with SKU {sku} not found for tenant {tenant.name}")
                     continue
                 
-                # Create stock item
-                StockItem.objects.create(
+                # Get or create warehouse
+                warehouse_name = row.get('warehouse', 'Main Warehouse')
+                
+                warehouse, warehouse_created = Warehouse.objects.get_or_create(
                     tenant=tenant,
-                    product_variant=variant,
-                    warehouse=warehouse,
-                    quantity=int(row.get('quantity', '0')),
-                    reorder_point=int(row.get('reorder_point', '10')),
-                    cost_price=Decimal(row.get('cost_price', '0.00')),
-                    is_active=True
+                    name=warehouse_name,
+                    defaults={
+                        'code': warehouse_name.upper().replace(' ', '_')[:10],
+                        'address': f"Warehouse address for {warehouse_name}",
+                        'is_active': True,
+                        'is_default': warehouse_name.lower() == 'main warehouse'
+                    }
                 )
                 
-                imported_count += 1
+                if warehouse_created:
+                    print(f"Created new warehouse: {warehouse.name}")
+                else:
+                    print(f"Using existing warehouse: {warehouse.name}")
+                
+                # Get or create stock item
+                stock_item, stock_created = StockItem.objects.get_or_create(
+                    tenant=tenant,
+                    product=product,
+                    warehouse=warehouse,
+                    defaults={
+                        'quantity': int(row.get('quantity', 0)),
+                        'reserved_quantity': 0  # Default to 0
+                    }
+                )
+                
+                if stock_created:
+                    imported_count += 1
+                    print(f"Created new stock item: {product.name} in {warehouse.name}")
+                else:
+                    # Update existing stock item
+                    stock_item.quantity = int(row.get('quantity', stock_item.quantity))
+                    stock_item.save()
+                    print(f"Updated existing stock item: {product.name} in {warehouse.name}")
                 
             except Exception as e:
-                print(f"Error importing inventory row: {e}")
+                error_count += 1
+                print(f"Error importing inventory row {row_num}: {e}")
+                print(f"Row data: {row}")
                 continue
     
+    print(f"Inventory import completed: {imported_count} items imported, {error_count} errors")
     return imported_count
 
 
 def import_suppliers(tenant, csv_reader):
     """Import suppliers from CSV"""
+    from products.models import Supplier
+    
     imported_count = 0
+    error_count = 0
+    
+    print(f"Starting supplier import for tenant: {tenant.name}")
+    print(f"CSV reader fieldnames: {csv_reader.fieldnames}")
     
     with transaction.atomic():
-        for row in csv_reader:
+        for row_num, row in enumerate(csv_reader, 1):
             try:
-                Supplier.objects.create(
+                print(f"Processing supplier row {row_num}: {row}")
+                
+                supplier, created = Supplier.objects.get_or_create(
                     tenant=tenant,
                     name=row.get('name', 'Unnamed Supplier'),
-                    contact_person=row.get('contact_person', 'Contact Person'),
-                    email=row.get('email', 'supplier@example.com'),
-                    phone=row.get('phone', '555-0123'),
-                    address=row.get('address', ''),
-                    is_active=True
+                    defaults={
+                        'contact_person': row.get('contact_person', ''),
+                        'email': row.get('email', ''),
+                        'phone': row.get('phone', ''),
+                        'address': row.get('address', ''),
+                        'website': row.get('website', ''),
+                        'payment_terms': row.get('payment_terms', ''),
+                        'notes': row.get('notes', ''),
+                        'is_active': True  # Default to active
+                    }
                 )
                 
-                imported_count += 1
+                if created:
+                    imported_count += 1
+                    print(f"Created new supplier: {supplier.name}")
+                else:
+                    print(f"Supplier already exists: {supplier.name}")
                 
             except Exception as e:
-                print(f"Error importing supplier row: {e}")
+                error_count += 1
+                print(f"Error importing supplier row {row_num}: {e}")
+                print(f"Row data: {row}")
                 continue
     
+    print(f"Import completed: {imported_count} suppliers imported, {error_count} errors")
+    return imported_count
+
+
+def import_orders(tenant, csv_reader):
+    """Import orders from CSV"""
+    from orders.models import Order, OrderLine
+    from products.models import Product, ProductVariant
+    from django.utils.dateparse import parse_datetime
+    from django.utils import timezone
+    
+    imported_count = 0
+    error_count = 0
+    
+    with transaction.atomic():
+        for row_num, row in enumerate(csv_reader, 1):
+            try:
+                print(f"Processing order row {row_num}: {row}")
+                
+                # Get or create the product
+                product_sku = row.get('product_sku', '')
+                if not product_sku:
+                    print(f"No product SKU found in row {row_num}")
+                    continue
+                    
+                try:
+                    product = Product.objects.get(tenant=tenant, sku=product_sku)
+                except Product.DoesNotExist:
+                    print(f"Product with SKU {product_sku} not found for tenant {tenant.name}")
+                    continue
+                
+                # Create the order
+                order, order_created = Order.objects.get_or_create(
+                    tenant=tenant,
+                    order_number=row.get('order_number', f'ORD-{imported_count + 1}'),
+                    defaults={
+                        'order_type': 'sale',  # Default to sale
+                        'status': row.get('status', 'pending'),
+                        'customer_name': row.get('customer_name', 'Unknown Customer'),
+                        'customer_email': row.get('customer_email', 'customer@example.com'),
+                        'customer_phone': row.get('customer_phone', '555-0123'),
+                        'customer_address': '',  # Default empty
+                        'subtotal': Decimal(row.get('total_price', '0.00')),
+                        'tax_amount': Decimal('0.00'),  # Default to 0
+                        'discount_amount': Decimal('0.00'),  # Default to 0
+                        'shipping_amount': Decimal('0.00'),  # Default to 0
+                        'total_amount': Decimal(row.get('total_price', '0.00')),
+                        'payment_status': 'pending',  # Default to pending
+                        'payment_method': '',  # Default empty
+                        'shipping_address': '',  # Default empty
+                        'shipping_method': '',  # Default empty
+                        'order_date': parse_datetime(row.get('order_date', '')) if row.get('order_date') else timezone.now(),
+                        'required_date': None,  # Default to None
+                        'notes': ''  # Default empty
+                    }
+                )
+                
+                if order_created:
+                    print(f"Created new order: {order.order_number}")
+                else:
+                    print(f"Order already exists: {order.order_number}")
+                
+                # Create the order line
+                order_line, item_created = OrderLine.objects.get_or_create(
+                    tenant=tenant,
+                    order=order,
+                    product=product,
+                    defaults={
+                        'quantity': int(row.get('quantity', 1)),
+                        'unit_price': Decimal(row.get('unit_price', '0.00')),
+                        'line_total': Decimal(row.get('line_total', '0.00'))
+                    }
+                )
+                
+                if item_created:
+                    imported_count += 1
+                    print(f"Created order line for {product.name}")
+                else:
+                    print(f"Order line already exists for {product.name}")
+                
+            except Exception as e:
+                error_count += 1
+                print(f"Error importing order row {row_num}: {e}")
+                print(f"Row data: {row}")
+                continue
+    
+    print(f"Order import completed: {imported_count} orders imported, {error_count} errors")
     return imported_count
 
 
 @login_required
 def download_template(request, template_type):
     """Download CSV template for data import"""
-    samples = generate_sample_csvs()
+    import os
+    from django.conf import settings
     
-    if template_type not in samples:
+    # Map template types to file names
+    template_files = {
+        'products': 'products_template.csv',
+        'inventory': 'inventory_template.csv',
+        'orders': 'orders_template.csv',
+        'customers': 'customers_template.csv',
+        'suppliers': 'suppliers_template.csv'
+    }
+    
+    if template_type not in template_files:
         return JsonResponse({'error': 'Invalid template type.'}, status=400)
     
-    template_data = samples[template_type]
+    # Get the file path
+    file_name = template_files[template_type]
+    file_path = os.path.join(settings.BASE_DIR, 'templates', 'csv_templates', file_name)
     
-    # Create CSV response
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = f'attachment; filename="{template_data["filename"]}"'
+    # Check if file exists
+    if not os.path.exists(file_path):
+        return JsonResponse({'error': 'Template file not found.'}, status=404)
     
-    # Write CSV content
-    writer = csv.writer(response)
-    writer.writerow(template_data['headers'])
-    
-    for row in template_data['sample_data']:
-        writer.writerow(row)
-    
-    return response
+    # Read and serve the file
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            csv_content = file.read()
+        
+        response = HttpResponse(csv_content, content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="{file_name}"'
+        return response
+    except Exception as e:
+        return JsonResponse({'error': f'Error reading template file: {str(e)}'}, status=500)
 
 
 # Manual Entry Endpoints
